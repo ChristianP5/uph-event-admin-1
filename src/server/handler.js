@@ -20,14 +20,8 @@ const exportFormResponse = require("../services/response/exportFormResponse");
 const getUserByUsername = require("../services/users/getUserByUsername");
 
 const getRootHandler = (request, h) => {
-    const response = h.response({
-        status: 'success',
-        message: 'Welcome to Root!',
-    })
 
-    response.code(200);
-
-    return response;
+    return h.redirect('/authorization');
 }
 
 const getLostHandler = (request, h) => {
