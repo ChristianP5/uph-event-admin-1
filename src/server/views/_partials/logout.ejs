@@ -1,0 +1,12 @@
+<button class="btn btn-danger" id="logout-btn">Logout</button>
+<script>
+  const logoutButton = document.getElementById("logout-btn");
+  logoutButton.addEventListener("click", async () => {
+    localStorage.clear();
+
+    // TODO : Add Delete Refresh Token API
+
+    location.href = "/login";
+    return;
+  });
+</script>
