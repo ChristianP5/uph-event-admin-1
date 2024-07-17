@@ -18,6 +18,8 @@ const createResponse = require("../services/response/createResponse");
 const getResponsesByFormId = require("../services/response/getResponsesByFormId");
 const exportFormResponse = require("../services/response/exportFormResponse");
 const getUserByUsername = require("../services/users/getUserByUsername");
+const getUserById = require("../services/users/getUserById");
+const editUser = require("../services/users/editUser");
 
 const getRootHandler = (request, h) => {
 
@@ -35,6 +37,137 @@ const getLostHandler = (request, h) => {
     return response;
 }
 
+/*
+    EDIT USER Handler
+    1) Get the Target Changed User and their role
+    2) Get the Current User's Role
+    3) Validate Edit if Current User's Role is higher than Target User
+        - [true]     "admin/admin/admin" > "admin/admin/admin"
+        - [true]     "admin/admin/admin" > "admin/<event-id>/admin"
+        - [false]    "admin/<event-id-a>/admin" > "admin/<event-id-b>/admin"
+        - [true]     "<dep-id>/<event-id>/admin" > "<dep-id>/<event-id>/user"
+        - [false]    "<dep-id-a>/<event-id>/admin" > "<dep-id-b>/<event-id>/admin"
+        - [false]    "<dep-id-a>/<event-id>/user" > "<dep-id-b>/<event-id>/user"
+    4) IF Edit Self:
+        - delete current RT
+        - create new Tokens (Access and RT)
+
+    TODO:
+        - Make this Handler
+        - Create Delete Refresh Token Function
+*/
+const editUserHandler = async (request, h) => {
+    // 1)
+    const { userId } = request.payload;
+    const targetUser = await getUserById(userId);
+    const targetUserRole = targetUser.role;
+
+    // 2)
+
+    return 1;
+}
+
+/*
+    EDIT DEPARTMENT USER Handler
+    1) Get UserInfo from Token
+    2) Validate if User is Authorized by role:
+    - "admin/admin/admin"
+    - "admin/<this-department-id>/admin"
+    - "<this-event-id>/<this-department-id>/admin"
+    - "<this-event-id>/<this-department-id>/user and <target-user-id> === <this-user-id>"
+    3) Edit the Target User. 
+    - If Target User is the Current User:   Create New RT and Access Token
+*/
+const editDepartmentUserHandler = async (request, h) => {
+    const { eventId, departmentId, userId } = request.params;
+    const { username, password } = request.payload;
+
+    // 1)
+    const userInfo = request.auth.credentials._doc;
+
+    // 2)
+    const userRole = userInfo.role;
+    const [department_id, event_id, access_level] = userRole.split('/');
+
+    if( (department_id !== departmentId && department_id !== "admin") || (event_id !== eventId && event_id !== "admin") || (access_level !== "admin" && access_level !== "user") ){
+        throw new Error('Unauthorized!');
+    }
+
+    const currentUserId = userInfo._id;
+    const targetUserId = userId;
+    if(access_level === "user" && currentUserId !== targetUserId){
+        throw new Error('Unauthorized!');
+    }
+
+    // 3)
+    const modifiedUser = await editUser(targetUserId, username, password);
+
+    if(currentUserId === targetUserId){
+        const payload = modifiedUser;
+
+        const accessToken = generateAccessToken(payload);
+        const refreshToken = generateRefreshToken(payload);
+
+        await saveRefreshToken(refreshToken);
+
+        const response = h.response({
+            status: 'success',
+            message: 'User Modified Successfully!',
+            data: {
+                accessToken: accessToken,
+                refreshToken: refreshToken,
+            }
+        });
+    
+        response.code(200);
+    
+        return response;
+
+    }
+
+    const response = h.response({
+        status: 'success',
+        message: 'User Modified Successfully!',
+    });
+
+    response.code(200);
+
+    return response;
+
+
+}
+
+/*
+    GET EDIT DEPARTMENT USER PAGE Handler
+    1) Get Event Information
+    2) Get Department Information
+    3) Get User Information
+    4) Load Edit Department User Page
+*/
+const getEditDepartmentUserPageHandler = async (request, h) => {
+    const { eventId, departmentId, userId } = request.params;
+
+    // 1)
+    const event = await getEventById(eventId);
+
+    // 2)
+    const department = await getDepartmentById(departmentId);
+
+    // 3)
+    const user = await getUserById(userId);
+
+    const data = {
+        event: event,
+        department: department,
+        user: user,
+    };
+
+    return h.view('department/editUser.ejs', data);
+}
+
+/*
+    CREATE USER Handler
+*/
 const createUserHandler = async (request, h) => {
     const { username, password, role } = request.payload;
 
@@ -820,5 +953,6 @@ module.exports = {
     getFormPagePageHandler, getCreateResponsePagePageHandler,
     createDepartmentResponseHandler, getExportFormHandler,
     getDepartmentByIdHandler, getEventByIdHandler,
-    getFormByIdHandler
+    getFormByIdHandler,editUserHandler, getEditDepartmentUserPageHandler,
+    editDepartmentUserHandler
 }

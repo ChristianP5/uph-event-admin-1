@@ -12,7 +12,9 @@ const {
     createDepartmentMemberHandler, getFormPagePageHandler,
     getCreateResponsePagePageHandler, createDepartmentResponseHandler,
     getExportFormHandler, getDepartmentByIdHandler,
-    getEventByIdHandler, getFormByIdHandler
+    getEventByIdHandler, getFormByIdHandler,
+    editUserHandler, getEditDepartmentUserPageHandler,
+    editDepartmentUserHandler
 } = require('./handler');
 
 const path = require('path');
@@ -69,6 +71,11 @@ const routes = [
                 mode: 'try',
             }
         }
+    },
+    {
+        path: '/api/users',
+        method: 'PUT',
+        handler: editUserHandler,
     },
     {
         path: '/api/events',
@@ -147,6 +154,18 @@ const routes = [
         path: '/api/event/{eventId}/department/{departmentId}/responses',
         method: 'POST',
         handler: createDepartmentResponseHandler,
+        options: {
+            payload: {
+                allow: 'multipart/form-data',
+                multipart: true,
+                maxBytes: 1000000,
+            }
+        }
+    },
+    {
+        path: '/api/event/{eventId}/department/{departmentId}/users/{userId}',
+        method: 'PUT',
+        handler: editDepartmentUserHandler,
         options: {
             payload: {
                 allow: 'multipart/form-data',
@@ -245,6 +264,16 @@ const routes = [
         path: '/event/{eventId}/department/{departmentId}/users/new',
         method: 'GET',
         handler: getNewUserPageHandler,
+        options: {
+            auth: {
+                mode: 'try',
+            }
+        }
+    },
+    {
+        path: '/event/{eventId}/department/{departmentId}/users/{userId}',
+        method: 'GET',
+        handler: getEditDepartmentUserPageHandler,
         options: {
             auth: {
                 mode: 'try',

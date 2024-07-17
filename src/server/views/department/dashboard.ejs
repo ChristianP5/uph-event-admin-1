@@ -66,9 +66,14 @@
       <div class="container" id="members-list">
         <!-- Item Design Start -->
         <% users.forEach(user => {%>
-        <div class="row mt-s">
-          <div class="col">
-            <p><%= user.username %></p>
+        <div class="row mt-2">
+          <div class="col d-flex">
+            <a
+              href="/event/<%= event._id %>/department/<%= department._id %>/users/<%= user._id %>"
+              class="btn btn-primary ms-2"
+              >Edit User</a
+            >
+            <p class="ms-2"><%= user.username %></p>
           </div>
         </div>
         <%}); %>
