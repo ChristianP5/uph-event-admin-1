@@ -17,29 +17,26 @@
       crossorigin="anonymous"
     ></script>
     <script src="/auth/js/getAuthUserInfo.js"></script>
-    <script src="/department/js/newUser.js"></script>
+    <script src="/event/js/editAdminUser.js"></script>
   </head>
   <body class="container p-5 d-flex justify-content-center align-items-center">
     <main class="container w-25">
       <div class="container">
-        <h1>Create Member</h1>
+        <h1>Edit <%= event.name %> Admin</h1>
         <h1 id="event-id" style="display: none"><%= event._id %></h1>
-        <h1 id="department-id" style="display: none"><%= department._id %></h1>
+        <h1 id="user-id" style="display: none"><%= eventAdmin._id %></h1>
       </div>
       <form action="" id="main-form" method="post">
         <div class="form-floating">
           <input type="hidden" name="eventId" value="<%= event._id %>" />
-          <input
-            type="hidden"
-            name="departmentId"
-            value="<%= department._id %>"
-          />
+          <input type="hidden" name="userId" value="<%= eventAdmin._id %>" />
           <input
             type="text"
             name="username"
             id="input-username"
             class="form-control"
             placeholder="Member Username"
+            value="<%= eventAdmin.username %>"
             required
           />
           <label for="input-username" class="form-label">Username</label>
@@ -51,6 +48,7 @@
             id="input-password"
             class="form-control"
             placeholder="Member Password"
+            value="<%= eventAdmin.password %>"
             required
           />
           <label for="input-password" class="form-label">Password</label>
@@ -60,7 +58,7 @@
           class="container d-flex justify-content-center align-items-center mt-3"
         >
           <button type="button" id="submit-btn" class="btn btn-primary">
-            Create Member
+            Edit Admin
           </button>
         </div>
       </form>

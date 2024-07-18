@@ -28,10 +28,14 @@
     <a href="/event/<%= eventId %>/department/new" class="btn btn-success">
       Create Department
     </a>
-    <div id="main-list" class="container">
+    <div id="main-list" class="container mt-2">
+      <h2>Departments</h2>
       <!-- Item Design Start -->
       <!--
       <a href="">
+        <button class="btn btn-danger delete-department-btn">
+          Delete Department
+        </button>
         <div class="row mt-2">
           <div class="col">
             <h3>Department Name</h3>
@@ -40,17 +44,44 @@
       </a>
       -->
       <!-- Item Design End -->
+      <!-- TODO: Change to Fetch -->
+      <!--
       <% departments.forEach(department => { %>
-      <a
-        href="/event/<%= eventId %>/department/<%= department._id %>/dashboard"
-      >
-        <div class="row mt-2">
-          <div class="col">
-            <h3><%= department.name %></h3>
-          </div>
+      <div class="row mt-2">
+        <div class="col d-flex">
+          <a
+            href="/event/<%= eventId %>/department/<%= department._id %>/edit"
+            class="btn btn-primary me-2"
+            >Edit Department</a
+          >
+          <a
+            href="/event/<%= eventId %>/department/<%= department._id %>/dashboard"
+            ><p><%= department.name %></p></a
+          >
         </div>
-      </a>
+      </div>
       <% }) %>
+      -->
+    </div>
+    <div class="container mt-2" id="admin-credentials-sect">
+      <h2>Admin Credentials</h2>
+      <a href="/event/<%= eventId %>/admin/edit" class="btn btn-primary"
+        >Edit Admin Credentials</a
+      >
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Username</th>
+            <th>Password</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><%= adminUser.username %></td>
+            <td><%= adminUser.password %></td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   </body>
 </html>

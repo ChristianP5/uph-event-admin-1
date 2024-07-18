@@ -1,4 +1,7 @@
-<button class="btn btn-danger" id="logout-btn">Logout</button>
+<div class="container d-flex align-items-center">
+  <button class="btn btn-danger" id="logout-btn">Logout</button>
+  <p class="ms-2"><b>Logged In as : </b><span id="current-user"></span></p>
+</div>
 <script>
   const logoutButton = document.getElementById("logout-btn");
   logoutButton.addEventListener("click", async () => {
@@ -8,5 +11,11 @@
 
     location.href = "/login";
     return;
+  });
+
+  const currentUserText = document.getElementById("current-user");
+
+  getAuthUserInfo().then((userInfo) => {
+    currentUserText.textContent = userInfo.username;
   });
 </script>

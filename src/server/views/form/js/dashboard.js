@@ -60,7 +60,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             const url = window.URL.createObjectURL(blob);
             tempAnchor.href = url;
 
-            tempAnchor.download = `${formId}-responses.xlsx`;
+            const formName = document.getElementById('form-name').textContent;
+            tempAnchor.download = `${formName}-responses.xlsx`;
 
             document.body.appendChild(tempAnchor);
             tempAnchor.click();

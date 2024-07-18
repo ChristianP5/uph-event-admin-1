@@ -22,7 +22,7 @@
   <body class="container p-5">
     <%- include('../_partials/logout.ejs') %> <%-
     include('../_partials/breadcrumb.ejs') %>
-    <h1><%= form.name %></h1>
+    <h1 id="form-name"><%= form.name %></h1>
     <div class="container">
       <a
         href="/event/<%= event._id %>/department/<%= department._id %>/form/<%= form._id %>/response/new"

@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const Users = require('../../models/Users');
 
-const getUsersByDepartmentId = async (departmentId) => {
+const getUsersByDepartmentId = async (departmentId, query_access_level = "user") => {
     mongoose.connect(process.env.MONGODB_URL);
 
     try{
@@ -17,7 +17,7 @@ const getUsersByDepartmentId = async (departmentId) => {
             const userRole = user.role;
             const [department_id, event_id, access_level] = userRole.split('/');
 
-            if(department_id === departmentId && access_level === "user"){
+            if(department_id === departmentId && access_level === query_access_level){
                 return true;
             }
         })

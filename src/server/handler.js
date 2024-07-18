@@ -20,6 +20,17 @@ const exportFormResponse = require("../services/response/exportFormResponse");
 const getUserByUsername = require("../services/users/getUserByUsername");
 const getUserById = require("../services/users/getUserById");
 const editUser = require("../services/users/editUser");
+const deleteUserById = require("../services/users/deleteUserById");
+const getUserByEventId = require("../services/users/getUserByEventId");
+const editEvent = require("../services/events/editEvent");
+const editDepartment = require("../services/departments/editDepartment");
+const getAdminUser = require("../services/users/getAdminUser");
+const deleteForm = require("../services/forms/deleteForm");
+const deleteResponseByFormId = require("../services/response/deleteResponseByFormId");
+const deleteDepartment = require("../services/departments/deleteDepartment");
+const deleteUserByDepartmentId = require("../services/users/deleteUserByDepartmentId");
+const deleteEvent = require("../services/events/deleteEvent");
+const deleteUserByEventId = require("../services/users/deleteUserByEventId");
 
 const getRootHandler = (request, h) => {
 
@@ -38,43 +49,168 @@ const getLostHandler = (request, h) => {
 }
 
 /*
-    EDIT USER Handler
-    1) Get the Target Changed User and their role
-    2) Get the Current User's Role
-    3) Validate Edit if Current User's Role is higher than Target User
-        - [true]     "admin/admin/admin" > "admin/admin/admin"
-        - [true]     "admin/admin/admin" > "admin/<event-id>/admin"
-        - [false]    "admin/<event-id-a>/admin" > "admin/<event-id-b>/admin"
-        - [true]     "<dep-id>/<event-id>/admin" > "<dep-id>/<event-id>/user"
-        - [false]    "<dep-id-a>/<event-id>/admin" > "<dep-id-b>/<event-id>/admin"
-        - [false]    "<dep-id-a>/<event-id>/user" > "<dep-id-b>/<event-id>/user"
-    4) IF Edit Self:
-        - delete current RT
-        - create new Tokens (Access and RT)
-
-    TODO:
-        - Make this Handler
-        - Create Delete Refresh Token Function
+    GET DEPARTMENT ADMIN Handler
+    1) Get UserInfo from Token
+    2) Validate if User is Authorized for role:
+    - "admin/admin/admin"
+    - "admin/<this-department-id>/admin"
+    - "<this-event-id>/<this-department-id>/admin"
+    - "<this-event-id>/<this-department-id>/user and <target-user-id> === <this-user-id>"
+    3) Get Department User By Department ID
 */
-const editUserHandler = async (request, h) => {
+const getDepartmentAdminHandler = async (request, h) => {
+    const { eventId, departmentId } = request.params;
+
     // 1)
-    const { userId } = request.payload;
-    const targetUser = await getUserById(userId);
-    const targetUserRole = targetUser.role;
+    const userInfo = request.auth.credentials._doc;
+    
+    // 2)
+    const userRole = userInfo.role;
+
+    const [department_id, event_id, access_level] = userRole.split('/');
+    if( (department_id !== "admin" && department_id !== departmentId) || (event_id !== eventId && event_id !== "admin") || access_level !== "admin" ){
+        throw new Error('Unauthorized');
+    }
+
+    // 3)
+    const adminUser = await getUsersByDepartmentId(departmentId, "admin");
+
+    const response = h.response({
+        status: 'success',
+        message: 'User retrieved successfully!',
+        data: {
+            adminUser: adminUser[0],
+        }
+    });
+
+    response.code(200);
+
+    return response;
+}
+
+/*
+    EDIT DEPARTMENT PAGE Handler
+    1) Get Event Info
+    2) Get Department Info
+    3) Load Page
+
+*/
+const getEditDepartmentPageHandler = async (request, h) => {
+    const {eventId, departmentId} = request.params;
+
+    // 1)
+    const event = await getEventById(eventId);
 
     // 2)
+    const department = await getDepartmentById(departmentId);
 
-    return 1;
+    // 3)
+    const data = {
+        event: event,
+        department: department,
+    };
+
+    return h.view('event/editDepartment.ejs', data);
+};
+
+/*
+    EDIT DEPARTMENT Handler
+    1) Get UserInfo from Token
+    2) Validate if User is Authorized by role:
+    - "admin/admin/admin"
+    - "admin/<this-event-id>/admin"
+    3) Edit the Department
+    
+*/
+const editDepartmentHandler = async (request, h) => {
+    const {eventId, departmentId} = request.params;
+    const {name} = request.payload;
+
+    // 1)
+    const userInfo = request.auth.credentials._doc;
+
+    // 2)
+    const userRole = userInfo.role;
+    const [department_id, event_id, access_level] = userRole.split('/');
+
+    if( department_id !== "admin" || (event_id !== eventId && event_id !== "admin") || access_level !== "admin" ){
+        throw new Error('Unauthorized!');
+    }
+
+    // 3)
+    const department = await editDepartment(departmentId, name);
+
+    const response = h.response({
+        status: 'success',
+        message: 'Department Updated Successfully!',
+    });
+
+    response.code(200);
+
+    return response;
 }
+
+/*
+    DELETE DEPARTMENT Handler
+    1) Get User Info
+    2) Validate User Role:
+    - "admin/admin/admin"
+    - "admin/<this-event-id>/admin"
+    3) Delete Department
+    4) and its Members
+    5) and its Admin
+    6) and its Forms
+    7) and its Forms' Responses
+*/
+const deleteDepartmentHandler = async (request, h) => {
+    const { eventId, departmentId } = request.params;
+
+    // 1)
+    const userInfo = request.auth.credentials._doc;
+
+    // 2)
+    const userRole = userInfo.role;
+    const [department_id, event_id, access_level] = userRole.split('/');
+
+    if( department_id !== "admin" || (event_id !== eventId && event_id !== "admin") || access_level !== "admin" ){
+        throw new Error('Unauthorized!');
+    };
+
+    // 3)
+    await deleteDepartment(departmentId);
+
+    // 4) and 5)
+    await deleteUserByDepartmentId(departmentId);
+
+    // 6)
+    const forms = await getFormsByDepartmentId(departmentId);
+    forms.forEach(async form => {
+        const formId = form._id;
+
+        await deleteForm(formId);
+
+        // 7)
+        await deleteResponseByFormId(formId);
+    });
+
+    const response = h.response({
+        status: 'success',
+        message: 'Department deleted successfully!',
+    });
+
+    response.code(200);
+
+    return response;
+};
 
 /*
     EDIT DEPARTMENT USER Handler
     1) Get UserInfo from Token
     2) Validate if User is Authorized by role:
     - "admin/admin/admin"
-    - "admin/<this-department-id>/admin"
-    - "<this-event-id>/<this-department-id>/admin"
-    - "<this-event-id>/<this-department-id>/user and <target-user-id> === <this-user-id>"
+    - "admin/<this-event-id>/admin"
+    - "<this-department-id>/<this-event-id>/admin"
+    - "<this-department-id>/<this-event-id>/user and <target-user-id> === <this-user-id>"
     3) Edit the Target User. 
     - If Target User is the Current User:   Create New RT and Access Token
 */
@@ -166,6 +302,266 @@ const getEditDepartmentUserPageHandler = async (request, h) => {
 }
 
 /*
+    TODO:
+    - [DONE] Make Edit Event Functionality
+    - [DONE] Make Edit Department Functionality
+    - [DONE] Make Edit Admin User Functionaility
+    - Make Delete Event Functionality
+    - [DONE] Make Delete Department Functionality
+    - [DONE] Make Delete Form Functionality
+*/
+
+/*
+    EDIT EVENT Handler
+    1) Get UserInfo
+    2) Validate User Role:
+    - "admin/admin/admin"
+    - "admin/<this-event-id>/admin"
+    3) Edit Event
+*/
+const editEventHandler = async (request, h) => {
+    const { eventId } = request.params;
+    const { name } = request.payload;
+
+    // 1)
+    const userInfo = request.auth.credentials._doc;
+
+    // 2)
+    const userRole = userInfo.role;
+    const [department_id, event_id, access_level] = userRole.split('/');
+
+    if(department_id !== "admin"  || ( event_id !== "admin" && event_id !== eventId ) || access_level !== "admin"){
+        throw new Error('Unauthorized');
+    };
+
+    // 3)
+    const event = await editEvent(eventId, name);
+
+    const response = h.response({
+        status: 'success',
+        message: 'Department Updated Succesfully!',
+    });
+
+    response.code(200);
+
+    return response;
+}
+
+/*
+    DELETE EVENT Handler
+    1) Get User Info
+    2) Validate User Role:
+    - "admin/admin/admin"
+    3) Delete Event
+    4) and its Event Admin
+    5) and its Departments
+    6) and each Department's Users
+    7) and each Department's Admin
+    8) and each Department's Form
+    9) and each Form's Responses
+*/
+const deleteEventHandler = async (request, h) => {
+    const { eventId } = request.params;
+
+    // 1)
+    const userInfo = request.auth.credentials._doc;
+
+    // 2)
+    const userRole = userInfo.role;
+    const [department_id, event_id, access_level] = userRole.split('/');
+
+    if(department_id !== "admin" || event_id !== "admin" || access_level !== "admin"){
+        throw new Error('Unauthorized');
+    };
+
+    // 3)
+    await deleteEvent(eventId);
+
+    // 4)
+    await deleteUserByEventId(eventId);
+
+    // 5)
+    const departments = await getDepartmentsByEventId(eventId);
+    departments.forEach(async department => {
+        const departmentId = department._id;
+
+        await deleteDepartment(departmentId);
+
+        // 6) and 7)
+        await deleteUserByDepartmentId(departmentId);
+
+        // 8)
+        const forms = await getFormsByDepartmentId(departmentId);
+        forms.forEach(async form => {
+            const formId = form._id;
+
+            await deleteForm(formId);
+
+            // 9)
+            await deleteResponseByFormId(formId);
+        });
+    });
+
+    const response = h.response({
+        status: 'success',
+        message: 'Event deleted successfully!',
+    });
+
+    response.code(200);
+
+    return response;
+}
+
+/*
+    EDIT EVENT PAGE Handler
+    1) Get Event Info
+    2) Load Event Page
+*/
+const getEditEventPageHandler = async (request, h) => {
+    const { eventId } = request.params;
+
+    // 1)
+    const event = await getEventById(eventId);
+
+    // 2)
+    const data = {
+        event: event,
+    };
+
+    return h.view('event/editEvent.ejs', data);
+
+}
+
+
+/*
+    EDIT EVENT ADMIN Handler
+    1) Get UserInfo
+    2) Validate User Role:
+    - "admin/admin/admin"
+    - "admin/<this-event-id>/admin"
+    3) Edit Event Admin
+    - If the current user IS the Event Admin, then remake tokens
+*/
+const editEventAdminHandler = async (request, h) => {
+    const { eventId } = request.params;
+    const { username, password, userId } = request.payload;
+
+    // 1)
+    const userInfo = request.auth.credentials._doc;
+
+    // 2)
+    const userRole = userInfo.role;
+    const [department_id, event_id, access_level] = userRole.split('/');
+
+    if(department_id !== "admin" || (event_id !== "admin" && event_id !== eventId) || access_level !== "admin" ){
+        throw new Error('Unauthorized');
+    };
+
+    // 3)
+    const targetUserId = userId;
+    const currentUserId = userInfo._id;
+
+    const newUser = await editUser(targetUserId, username, password);
+
+    if(targetUserId === currentUserId){
+        const payload = newUser;
+        const accessToken = generateAccessToken(payload);
+        const refreshToken = generateRefreshToken(payload);
+
+        await saveRefreshToken(refreshToken);
+
+        const response = h.response({
+            status: 'success',
+            message: 'Event Admin User Updated!',
+            data: {
+                accessToken: accessToken,
+                refreshToken: refreshToken,
+            },
+        });
+
+        response.code(200);
+
+        return response;
+
+    }
+
+    const response = h.response({
+        status: 'success',
+        message: 'Event Admin User Updated!',
+    });
+
+    response.code(200);
+
+    return response;
+
+}
+
+/*
+    EDIT DEPARTMENT ADMIN Handler
+    1) Get UserInfo
+    2) Validate UserRole:
+    - "admin/admin/admin"
+    - "admin/<this-event-id>/admin"
+    - "<this-department-id>/<this-event-id>/admin"
+    3) Edit the Department Admin
+    - if current user is "<this-department-id>/<this-event-id>/admin", then remake tokens
+*/
+const editDepartmentAdminHandler = async (request, h) => {
+    const { eventId, departmentId } = request.params;
+    const { username, password } = request.payload;
+
+    // 1)
+    const userInfo = request.auth.credentials._doc;
+    
+    // 2)
+    const userRole = userInfo.role;
+    const [department_id, event_id, access_level] = userRole.split('/');
+
+    if((department_id !== departmentId && department_id !== "admin") || (event_id !== eventId && event_id !=="admin" ) || access_level !== "admin"){
+        throw new Error('Unauthorized');
+    };
+
+    // 3)
+    const targetUser = await getUsersByDepartmentId(departmentId, "admin");
+
+    const newUser = await editUser(targetUser[0]._id, username, password);
+
+    // IF User is the Department Admin User being Modified
+    if(department_id === departmentId && event_id === eventId && access_level === "admin"){
+        
+        const payload = newUser;
+
+        const accessToken = generateAccessToken(payload);
+        const refreshToken = generateRefreshToken(payload);
+
+        await saveRefreshToken(refreshToken);
+
+        const response = h.response({
+            status: 'success',
+            message: 'Department Admin Updated Successfully!',
+            data: {
+                accessToken: accessToken,
+                refreshToken: refreshToken,
+            },
+        });
+
+        response.code(200);
+
+        return response;
+
+    };
+
+    const response = h.response({
+        status: 'success',
+        message: 'Department Admin Updated Successfully!',
+    });
+
+    response.code(200);
+
+    return response;
+}
+
+/*
     CREATE USER Handler
 */
 const createUserHandler = async (request, h) => {
@@ -179,6 +575,83 @@ const createUserHandler = async (request, h) => {
     })
 
     response.code(201);
+    return response;
+}
+
+/*
+    DELETE DEPARTMENT USER Handler
+    1) Get UserInfo
+    2) Validate User Role
+    - "admin/admin/admin"
+    - "admin/<this-event-id>/admin"
+    - "<this-department-id>/<this-event-id>/admin"
+    3) Delete Department User
+*/
+const deleteDepartmentUserHandler = async (request, h) => {
+    const {eventId, departmentId, userId} = request.params;
+
+    // 1)
+    const userInfo = request.auth.credentials._doc;
+    
+    // 2)
+    const userRole = userInfo.role;
+    const [department_id, event_id, access_level] = userRole.split('/');
+
+    if((department_id !== "admin" && department_id !== departmentId) || (event_id !== "admin" && event_id !== eventId) || access_level !== "admin"){
+        throw new Error('Unauthorized');
+    }
+
+    // 3)
+    await deleteUserById(userId);
+
+    const response = h.response({
+        status: 'success',
+        message: 'User deleted successfully!',
+    });
+
+    response.code(200);
+
+    return response;
+
+
+}
+
+/*
+    GET USERS BY DEPARTMENT ID Handler
+    1) Get UserInfo
+    2) Validate Role
+        - "admin/admin/admin"
+        - "<this-department-id>/<event-id>/admin"
+        - "<this-department-id>/<event-id>/user"
+    3) Retrieve Users
+*/
+const getUsersByDepartmentIdHandler = async (request, h) => {
+    const { departmentId } = request.params;
+
+    // 1)
+    const userInfo = request.auth.credentials._doc;
+
+    // 2)
+    const userRole = userInfo.role;
+    const [department_id, event_id, access_level] = userRole.split('/');
+
+    if((department_id !== departmentId && department_id !== "admin") || (!event_id) || (access_level !== "admin" && access_level !== "user")){
+        throw new Error('Unauthorized');
+    }
+
+    // 3)
+    const users = await getUsersByDepartmentId(departmentId);
+
+    const response = h.response({
+        status: 'success',
+        message: 'Users retrieved successfully!',
+        data: {
+            users: users,
+        }
+    });
+
+    response.code(200);
+
     return response;
 }
 
@@ -221,7 +694,14 @@ const postLoginHandler = async (request, h) => {
     const user = await getUserByCredentials(username, password);
 
     // 4)
-    const payload = user;
+    const payload = {
+        _doc: {
+            _id: user._id,
+            role: user.role,
+            username: username,
+            password: password,
+        }
+    };
     const accessToken = generateAccessToken(payload);
 
     // 5)
@@ -300,6 +780,7 @@ const getAuthUserHandler = async (request, h) => {
 /*
     GET ADMIN DASHBOARD PAGE Handler
     1) Get the Events Information
+    2) Load Admin Dashbaord Page
 */
 
 const getAdminDashboardPageHandler = async (request, h) => {
@@ -307,11 +788,128 @@ const getAdminDashboardPageHandler = async (request, h) => {
     // 1)
     const events = await getAllEvents();
 
+    // 2)
     const data = {
         events
     }
 
     return h.view('admin/dashboard.ejs', data);
+}
+
+/*
+    GET ADMIN USER Handler
+    1) Get UserInfo
+    2) Validate User Role:
+    - "admin/admin/admin"
+    3) Get Admin User
+*/
+const getAdminUserHandler= async (request, h) => {
+    // 1)
+    const userInfo = request.auth.credentials._doc;
+
+    // 2)
+    const userRole = userInfo.role;
+
+    const [department_id, event_id, access_level] = userRole.split('/');
+
+    if(department_id !== "admin" || event_id !== "admin" || access_level !== "admin"){
+        throw new Error('Unauthorized');
+    }
+
+    // 3)
+    const users = await getAdminUser();
+
+    const response = h.response({
+        status: 'success',
+        message: 'User retrieved successfully!',
+        data: {
+            users: users,
+        },
+    });
+
+    response.code(200);
+
+    return response;
+
+}
+
+/*
+    GET EDIT ADMIN USER PAGE Handler
+    1) Get Admin User Info
+    2) Load Edit Admin User Page
+*/
+const getEditAdminUserPageHandler = async (request, h) => {
+    const { userId } = request.params;
+    // 1)
+    const user = await getUserById(userId);
+
+    // 2)
+    const data = {
+        user : user,
+    };
+
+    return h.view('admin/editAdminUser.ejs', data);
+}
+
+/*
+    EDIT ADMIN USER Handler
+    1) Get UserInfo
+    2) Validate User Role:
+    - "admin/admin/admin"
+    3) Edit Admin User
+    - If Current User is the Edited Admin User
+*/
+const editAdminUserHandler = async (request, h) => {
+    const { userId: targetUserId } = request.params;
+    const { username, password } = request.payload;
+
+    // 1)
+    const userInfo = request.auth.credentials._doc;
+
+    // 2)
+    const userRole = userInfo.role;
+    const [department_id, event_id, access_level] = userRole.split('/');
+
+    if(department_id !== "admin" || event_id !== "admin" || access_level !== "admin"){
+        throw new Error('Unauthorized');
+    };
+
+    // 3)
+    const newUser = await editUser(targetUserId, username, password);
+
+    if(userInfo._id === targetUserId){
+        const payload = newUser;
+
+        const accessToken = generateAccessToken(payload);
+        const refreshToken = generateRefreshToken(payload);
+
+        await saveRefreshToken(refreshToken);
+
+        const response = h.response({
+            status: 'success',
+            message: 'User Updated Successfully!',
+            data: {
+                accessToken: accessToken,
+                refreshToken: refreshToken,
+            },
+        });
+
+        response.code(200);
+
+        return response;
+    };
+
+    const response = h.response({
+        status: 'success',
+        message: 'User Updated Successfully!',
+    });
+
+    response.code(200);
+
+    return response;
+
+
+
 }
 
 /*
@@ -359,6 +957,41 @@ const createEventHandler = async (request, h) => {
 }
 
 /*
+    GET EVENTS Handler
+    1) Get User Info
+    2) Validate User Role:
+    - "admin/admin/admin"
+    3) Get Events
+*/
+const getEventsHandler = async (request, h) => {
+    // 1)
+    const userInfo = request.auth.credentials._doc;
+
+    // 2)
+    const userRole = userInfo.role;
+    const [department_id, event_id, access_level] = userRole.split('/');
+
+    if(department_id !== "admin" || event_id !== "admin" || access_level !== "admin"){
+        throw new Error('Unauthorized');
+    };
+
+    // 3)
+    const events = await getAllEvents();
+
+    const response = h.response({
+        status: 'success',
+        message: 'Events retrieved successfully!',
+        data: {
+            events: events,
+        },
+    });
+
+    response.code(200);
+
+    return response;
+}
+
+/*
     GET EVENT BY ID Handler
     1) Validate if User has role = "admin/admin/admin" or "admin/<this-event-id>/admin"
     2) Get Event By Id
@@ -396,6 +1029,7 @@ const getEventByIdHandler = async (request, h) => {
     GET EVENT DASHBOARD PAGE Handler
     1) Get the Event Information from eventId
     2) Get the Departments of the Event
+    3) Get the Admin User of the Event
 */
 const getEventDashboardPageHandler = async (request, h) => {
     const { eventId } = request.params;
@@ -406,15 +1040,41 @@ const getEventDashboardPageHandler = async (request, h) => {
     // 2)
     const departments = await getDepartmentsByEventId(eventId);
 
+    // 3)
+    const adminUser = await getUserByEventId(eventId);
 
     const data = {
         eventId : event._id,
         eventName : event.name,
         departments: departments,
+        adminUser: adminUser,
     };
 
     return h.view('event/dashboard.ejs', data);
     
+}
+
+/*
+    GET EDIT EVENT ADMIN PAGE Handler
+    1) Get Event Information
+    2) Get Event Admin Information
+    3) Load Edit Event Admin Page
+*/
+const getEditEventAdminPageHandler = async (request, h) => {
+    const {eventId} = request.params;
+    // 1)
+    const event = await getEventById(eventId);
+
+    // 2)
+    const eventAdmin = await getUserByEventId(eventId);
+
+    // 3)
+    const data = {
+        event: event,
+        eventAdmin: eventAdmin,
+    };
+
+    return h.view('event/editAdminUser.ejs', data);
 }
 
 /*
@@ -489,6 +1149,36 @@ const createDepartmentHandler = async (request, h) => {
 }
 
 /*
+    GET EDIT DEPARTMENT ADMIN PAGE Handler
+    1) Get Event Info
+    2) Get Department Info
+    3) Get User (Admin) Info
+    4) Load Edit Department Admin Page
+*/
+const getEditDepartmentAdminPageHandler = async (request, h) => {
+    const { eventId, departmentId } = request.params;
+    
+    // 1)
+    const event = await getEventById(eventId);
+
+    // 2)
+    const department = await getDepartmentById(departmentId);
+
+    // 3)
+    const user = await getUsersByDepartmentId(departmentId, "admin");
+
+    // 4)
+    const data = {
+        event: event,
+        department: department,
+        user: user[0],
+    };
+
+    return h.view('department/editAdminUser.ejs', data);
+    
+}
+
+/*
     GET DEPARTMENT BY ID Handler
     1) Validate if User has role =
         - "admin/admin/admin"
@@ -552,7 +1242,7 @@ const getDepartmentsByEventIdHandler = async (request, h) => {
         status: 'success',
         message: 'Departments retrieved successfully!',
         data: {
-            departments,
+            departments: departments,
         },
     });
 
@@ -587,11 +1277,15 @@ const getDepartmentDashboardPageHandler = async (request, h) => {
     // 4)
     const users = await getUsersByDepartmentId(departmentId);
 
+    // 5) 
+    const adminUser = await getUsersByDepartmentId(departmentId, "admin");
+
     const data = {
         event: event,
         department: department,
         forms: forms,
         users: users,
+        adminUser: adminUser[0],
     };
 
     return h.view('department/dashboard.ejs', data);
@@ -741,6 +1435,48 @@ const getFormsByDepartmentIdHandler = async (request, h) => {
     response.code(200);
     return response;
 
+}
+
+/*
+    DELETE FORM Handler
+    1) Get UserInfo
+    2) Validate User Role:
+    - "admin/admin/admin"
+    - "admin/<this-event-id>/admin"
+    - "<this-department-id>/<this-event-id>/admin"
+    3) Delete the Form
+    4) and its Responses
+*/
+const deleteFormHandler = async (request, h) => {
+    const { eventId, departmentId, formId } = request.params;
+
+    // 1)
+    const userInfo = request.auth.credentials._doc;
+
+    // 2)
+    const userRole = userInfo.role;
+    const [department_id, event_id, access_level] = userRole.split('/');
+
+    if( (department_id !== departmentId && department_id !== "admin") || ( event_id !== eventId && event_id !== "admin" ) || access_level !== "admin" ){
+        throw new Error('Unauthorized');
+    }
+
+    // 3)
+    await deleteForm(formId);
+
+    // 4)
+    await deleteResponseByFormId(formId);
+
+    const response = h.response({
+        status: 'success',
+        message: 'Form Deleted Successfully!',
+    });
+
+    response.code(200);
+
+    return response;
+
+    
 }
 
 /*
@@ -953,6 +1689,14 @@ module.exports = {
     getFormPagePageHandler, getCreateResponsePagePageHandler,
     createDepartmentResponseHandler, getExportFormHandler,
     getDepartmentByIdHandler, getEventByIdHandler,
-    getFormByIdHandler,editUserHandler, getEditDepartmentUserPageHandler,
-    editDepartmentUserHandler
+    getFormByIdHandler, getEditDepartmentUserPageHandler,
+    editDepartmentUserHandler, getUsersByDepartmentIdHandler,
+    deleteDepartmentUserHandler, getEditDepartmentAdminPageHandler,
+    editDepartmentAdminHandler, getDepartmentAdminHandler,
+    getEditEventAdminPageHandler, editEventAdminHandler,
+    editEventHandler, getEditEventPageHandler,
+    getEditDepartmentPageHandler, editDepartmentHandler, getAdminUserHandler,
+    getEditAdminUserPageHandler, editAdminUserHandler,
+    deleteFormHandler, deleteDepartmentHandler, deleteEventHandler,
+    getEventsHandler
 }

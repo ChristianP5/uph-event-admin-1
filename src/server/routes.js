@@ -12,9 +12,15 @@ const {
     createDepartmentMemberHandler, getFormPagePageHandler,
     getCreateResponsePagePageHandler, createDepartmentResponseHandler,
     getExportFormHandler, getDepartmentByIdHandler,
-    getEventByIdHandler, getFormByIdHandler,
-    editUserHandler, getEditDepartmentUserPageHandler,
-    editDepartmentUserHandler
+    getEventByIdHandler, getFormByIdHandler, getEditDepartmentUserPageHandler,
+    editDepartmentUserHandler, getUsersByDepartmentIdHandler,
+    deleteDepartmentUserHandler, getEditDepartmentAdminPageHandler,
+    editDepartmentAdminHandler, getDepartmentAdminHandler,
+    getEditEventAdminPageHandler, editEventAdminHandler,
+    editEventHandler, getEditEventPageHandler, getEditDepartmentPageHandler,
+    editDepartmentHandler, getAdminUserHandler, getEditAdminUserPageHandler,
+    editAdminUserHandler, deleteFormHandler, deleteDepartmentHandler,
+    deleteEventHandler, getEventsHandler
 } = require('./handler');
 
 const path = require('path');
@@ -62,6 +68,7 @@ const routes = [
         handler: getAuthUserHandler,
     },
     // API
+    /*
     {
         path: '/api/users',
         method: 'POST',
@@ -72,10 +79,28 @@ const routes = [
             }
         }
     },
+    */
     {
-        path: '/api/users',
+        path: '/api/departments/{departmentId}/users',
+        method: 'GET',
+        handler: getUsersByDepartmentIdHandler,
+    },
+    {
+        path: '/api/admin/user',
+        method: 'GET',
+        handler: getAdminUserHandler,
+    },
+    {
+        path: '/api/admin/user/{userId}',
         method: 'PUT',
-        handler: editUserHandler,
+        handler: editAdminUserHandler,
+        options: {
+            payload: {
+                allow: 'multipart/form-data',
+                multipart: true,
+                maxBytes: 1000000,
+            }
+        }
     },
     {
         path: '/api/events',
@@ -95,6 +120,16 @@ const routes = [
         handler: getEventByIdHandler,
     },
     {
+        path: '/api/events',
+        method: 'GET',
+        handler: getEventsHandler,
+    },
+    {
+        path: '/api/events/{eventId}',
+        method: 'DELETE',
+        handler: deleteEventHandler,
+    },
+    {
         path: '/api/departments',
         method: 'POST',
         handler: createDepartmentHandler,
@@ -112,9 +147,33 @@ const routes = [
         handler: getDepartmentByIdHandler,
     },
     {
-        path: '/api/event/{id}/departments',
+        path: '/api/event/{eventId}/departments',
         method: 'GET',
         handler: getDepartmentsByEventIdHandler,
+    },
+    {
+        path: '/api/event/{eventId}/admin',
+        method: 'PUT',
+        handler: editEventAdminHandler,
+        options: {
+            payload: {
+                allow: 'multipart/form-data',
+                multipart: true,
+                maxBytes: 1000000,
+            }
+        }
+    },
+    {
+        path: '/api/event/{eventId}',
+        method: 'PUT',
+        handler: editEventHandler,
+        options: {
+            payload: {
+                allow: 'multipart/form-data',
+                multipart: true,
+                maxBytes: 1000000,
+            }
+        }
     },
     {
         path: '/api/forms',
@@ -175,9 +234,53 @@ const routes = [
         }
     },
     {
+        path: '/api/events/{eventId}/departments/{departmentId}',
+        method: 'DELETE',
+        handler: deleteDepartmentHandler,
+    },
+    {
+        path: '/api/event/{eventId}/department/{departmentId}/admin/edit',
+        method: 'PUT',
+        handler: editDepartmentAdminHandler,
+        options: {
+            payload: {
+                allow: 'multipart/form-data',
+                multipart: true,
+                maxBytes: 1000000,
+            }
+        }
+    },
+    {
+        path: '/api/event/{eventId}/department/{departmentId}',
+        method: 'PUT',
+        handler: editDepartmentHandler,
+        options: {
+            payload: {
+                allow: 'multipart/form-data',
+                multipart: true,
+                maxBytes: 1000000,
+            }
+        }
+    },
+    {
+        path: '/api/event/{eventId}/department/{departmentId}/admin',
+        method: 'GET',
+        handler: getDepartmentAdminHandler,
+    },
+    {
+        path: '/api/event/{eventId}/department/{departmentId}/users/{userId}',
+        method: 'DELETE',
+        handler: deleteDepartmentUserHandler,
+    },
+    {
         path: '/api/event/{eventId}/department/{departmentId}/forms/{formId}/export',
         method: 'GET',
         handler: getExportFormHandler,
+    },
+    {
+        path: '/api/event/{eventId}/department/{departmentId}/forms/{formId}',
+        method: 'DELETE',
+        handler: deleteFormHandler,
     },
     // Pages
     {
@@ -211,6 +314,16 @@ const routes = [
         }
     },
     {
+        path: '/admin/user/{userId}/edit',
+        method: 'GET',
+        handler: getEditAdminUserPageHandler,
+        options: {
+            auth: {
+                mode: 'try',
+            }
+        }
+    },
+    {
         path: '/admin/event/new',
         method: 'GET',
         handler: getAdminNewEventPageHandler,
@@ -231,9 +344,39 @@ const routes = [
         }
     },
     {
+        path: '/event/{eventId}/edit',
+        method: 'GET',
+        handler: getEditEventPageHandler,
+        options: {
+            auth: {
+                mode: 'try',
+            }
+        }
+    },
+    {
+        path: '/event/{eventId}/admin/edit',
+        method: 'GET',
+        handler: getEditEventAdminPageHandler,
+        options: {
+            auth: {
+                mode: 'try',
+            }
+        }
+    },
+    {
         path: '/event/{eventId}/department/new',
         method: 'GET',
         handler: getEventNewDepartmentPageHandler,
+        options: {
+            auth: {
+                mode: 'try',
+            }
+        }
+    },
+    {
+        path: '/event/{eventId}/department/{departmentId}/edit',
+        method: 'GET',
+        handler: getEditDepartmentPageHandler,
         options: {
             auth: {
                 mode: 'try',
@@ -274,6 +417,16 @@ const routes = [
         path: '/event/{eventId}/department/{departmentId}/users/{userId}',
         method: 'GET',
         handler: getEditDepartmentUserPageHandler,
+        options: {
+            auth: {
+                mode: 'try',
+            }
+        }
+    },
+    {
+        path: '/event/{eventId}/department/{departmentId}/admin/edit',
+        method: 'GET',
+        handler: getEditDepartmentAdminPageHandler,
         options: {
             auth: {
                 mode: 'try',

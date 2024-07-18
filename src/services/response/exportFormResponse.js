@@ -11,6 +11,7 @@ const exportFormResponse = async (form, responses, department) => {
         const item = {
             formId: form._id,
             department: department.name,
+            departmentId: department._id,
             responseId: response._id,
             createdAt: response.createdAt,
         }
@@ -26,7 +27,8 @@ const exportFormResponse = async (form, responses, department) => {
 
     const columns = [
         { header: 'Form ID', key: 'formId', width: 15 },
-        { header: 'Department', key: 'depeartment', width: 15 },
+        { header: 'Department', key: 'department', width: 15 },
+        { header: 'Department ID', key: 'departmentId', width: 15 },
         { header: 'Response ID', key: 'responseId', width: 20 },
         { header: 'Time', key: 'createdAt', width: 15 },
     ];

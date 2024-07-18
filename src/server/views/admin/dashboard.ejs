@@ -22,19 +22,30 @@
   <body class="container p-5">
     <%- include('../_partials/logout.ejs'); %> <%-
     include('../_partials/breadcrumb.ejs') %>
-    <h1>Admin Dashboard</h1>
+    <h1 id="title">Admin Dashboard</h1>
     <a href="/admin/event/new" id="create-event-btn" class="btn btn-success"
       >Create Event</a
     >
-    <ul>
+    <div class="container mt-2" id="event-list">
+      <h3 id="title">Events</h3>
       <% events.forEach(event => { %>
-
       <!-- Item Design Start -->
-      <li>
-        <a href="/event/<%= event._id %>/dashboard">
-          <h3><%= event.name %></h3>
-        </a>
-      </li>
+      <!-- TODO: Change to Fetch -->
+      <!--
+      <div class="row mt-2">
+        <div class="col d-flex">
+          <a href="/event/<%= event._id %>/edit" class="btn btn-primary me-2"
+            >Edit Event</a
+          >
+          <button class="btn btn-danger me-2 delete-event-btn">
+            Delete Event
+          </button>
+          <a href="/event/<%= event._id %>/dashboard">
+            <p><%= event.name %></p>
+          </a>
+        </div>
+      </div>
+      -->
       <!-- Item Design End -->
 
       <% }) %>
@@ -47,6 +58,28 @@
       </li>
       -->
       <!-- Item Design End -->
-    </ul>
+    </div>
+    <div class="container mt-2">
+      <h3>Admin User Credentials</h3>
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Username</th>
+            <th>Password</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="admin-credentials-sect">
+          <!-- Item Design Start -->
+          <!--
+          <tr>
+            <td>Username</td>
+            <td>Password</td>
+          </tr>
+          -->
+          <!-- Item Design End -->
+        </tbody>
+      </table>
+    </div>
   </body>
 </html>
