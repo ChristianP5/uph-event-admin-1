@@ -28,6 +28,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // 3)
     const submitButton = document.getElementById('submit-btn');
     submitButton.addEventListener('click', async (e) => {
+        submitButton.disabled = true;
         e.preventDefault();
 
         const form = document.getElementById('main-form');

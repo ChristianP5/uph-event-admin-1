@@ -108,6 +108,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const submitButton = document.getElementById('submit-btn');
     submitButton.addEventListener('click', async (e) => {
         e.preventDefault();
+        submitButton.disabled = true;
 
         if(questionCount < 1){
             alert('Please Add Questions!');
