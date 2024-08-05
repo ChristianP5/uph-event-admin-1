@@ -112,21 +112,136 @@ document.addEventListener('DOMContentLoaded', async () => {
         `;
         */
 
+        // New
+        /*
+            <td class="py-3 px-4">${user.username}</td>
+            <td id="member-action-buttons" class="py-3 px-4">
+                <button id="edit-member-btn" class="bg-blue-500 text-white px-2 py-1 rounded" onclick="toggleEditCredentials('Christian', this)">Edit User Credentials</button>
+                <button id="delete-member-btn" class="bg-red-500 text-white px-2 py-1 rounded ms-2">Delete User</button>
+            </td>
+        */
+
         item.innerHTML = `
         <td class="py-3 px-4">${user.username}</td>
-        <td class="py-3 px-4">
-            <button class="bg-blue-500 text-white px-2 py-1 rounded" onclick="toggleEditCredentials('Christian', this)">Edit User Credentials</button>
+        <td id="member-action-buttons" class="py-3 px-4">
+            
         </td>
         `;
 
-        /*
-        if(access_level === "user" && userInfo.username !== user.username){
-            const editButton = item.querySelector('.btn.btn-primary.ms-2');
-            editButton.classList.add('disabled');
+        const memberActionButtons = item.querySelector('#member-action-buttons');
+        if(access_level === "admin" || (access_level === "user" && userInfo._id === user._id)){
+            const editButton = document.createElement('button');
+            editButton.id = "edit-member-btn";
+            editButton.classList = "bg-blue-500 text-white px-2 py-1 rounded"
+            editButton.innerHTML = "Edit User Credentials";
+            
+            memberActionButtons.appendChild(editButton);
+
+            // Edit Department User Functionality
+
+            function toggleEditMemberCredentials(memberUser, button) {
+                const container = document.getElementById('editMemberCredentialsContainer');
+                const row = button.closest('tr');
+                if (container.parentNode !== row) {
+                    container.remove();
+                    row.insertAdjacentElement('afterend', container);
+                }
+                container.classList.toggle('hidden');
+                container.querySelector('#newUsername').value = memberUser.username;
+
+                const submitButton = container.querySelector('#submit-btn');
+                submitButton.addEventListener('click', async (e) => {
+                    e.preventDefault();
+
+                    // Edit Department User Logic
+                    
+                    const form = container.querySelector('#edit-dep-member-creds-form');
+                    const formData = new FormData(form);
+
+                    const targetEndpoint = `/api/event/${eventId}/department/${departmentId}/users/${user._id}`;
+                    const result = await fetch(targetEndpoint, {
+                        method: 'PUT',
+                        headers: {
+                            'Authorization' : `Bearer ${accessToken}`,
+                        },
+                        body: formData,
+                    });
+
+                    const data = await result.json();
+
+                    if(!result.ok){
+                        alert(data.message);
+                        throw new Error(data.error);
+                    }
+
+                    // IF SELF EDIT
+                    if(userInfo._id === user._id){
+                        console.log('Token Remake');
+                        localStorage.setItem('accessToken', data.data.accessToken);
+                        localStorage.setItem('refreshToken', data.data.refreshToken);
+                    }
+
+                    location.href = `/event/${eventId}/department/${departmentId}/dashboard`;
+                    return;
+                })
+            }
+
+            editButton.addEventListener('click', async (e) => {
+                e.preventDefault();
+
+                toggleEditMemberCredentials(user, e.target);
+
+                
+            })
+
+            // Show Delete Department User Button (Only for Admin)
+
+            if(access_level === "admin"){
+                const deleteButton = document.createElement('button');
+                deleteButton.id = "delete-member-btn";
+                deleteButton.classList = "bg-red-500 text-white px-2 py-1 rounded ms-2";
+                deleteButton.innerHTML = "Delete User";
+
+                memberActionButtons.appendChild(deleteButton);
+
+                function confirmDeleteMember(userId) {
+                    document.getElementById('deleteMemberPopupOverlay').style.display = 'block';
+                    document.getElementById('deleteMemberPopup').style.display = 'block';
+                    document.getElementById('confirmDeleteMemberButton').onclick = async () => {
+                        
+                        const targetEndpoint = `/api/event/${eventId}/department/${departmentId}/users/${user._id}`;
+                        const result = await fetch(targetEndpoint, {
+                            method: 'DELETE',
+                            headers: {
+                                'Authorization' : `Bearer ${accessToken}`,
+                            }
+                        });
+                        const data = await result.json();
+
+                        if(!result.ok){
+                            alert(data.message);
+                            throw new Error(data.error);
+                        }
+
+                        location.href = `/event/${eventId}/department/${departmentId}/dashboard`
+                        return;
+
+                    };
+                }
+
+                deleteButton.addEventListener('click', async (e) => {
+                    e.preventDefault();
+
+                    confirmDeleteMember(user._id);
+
+
+                })
+            }
         }
 
-        const deleteButton = item.querySelector('.btn.btn-danger.ms-2.remove-department-user-btn');
-        */
+        
+
+        
 
         // Do not Show Delete Buttons to Users
         /*
@@ -237,10 +352,67 @@ document.addEventListener('DOMContentLoaded', async () => {
             <td class="py-3 px-4">${adminUser.username}</td>
             <td class="py-3 px-4">${adminUser.password}</td>
             <td class="py-3 px-4">
-                <button class="bg-blue-500 text-white px-2 py-1 rounded" onclick="toggleEditCredentials('Christian', this)">Edit User Credentials</button>
+                <button id="edit-dep-admin-creds-btn" class="bg-blue-500 text-white px-2 py-1 rounded" onclick="toggleEditCredentials('Christian', this)">Edit User Credentials</button>
             </td>
         </tr>
         `;
+
+        // Edit Department Admin Credentials Functionality
+
+        function toggleEditAdminCredentials(user, button) {
+            const container = document.getElementById('editAdminCredentialsContainer');
+            const row = button.closest('tr');
+            if (container.parentNode !== row) {
+                container.remove();
+                row.insertAdjacentElement('afterend', container);
+            }
+            container.classList.toggle('hidden');
+            container.querySelector('#newUsername').value = user.username;
+
+            const submitButton = container.querySelector('#submit-btn');
+            submitButton.addEventListener('click', async (e) => {
+                e.preventDefault();
+
+                // Edit Department Admin Credentials Logic
+                const form = container.querySelector('#edit-dep-admin-creds-form');
+                const formData = new FormData(form);
+
+                const targetEndpoint = `/api/event/${eventId}/department/${departmentId}/admin/edit`;
+                const result = await fetch(targetEndpoint, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization' : `Bearer ${accessToken}`,
+                    },
+                    body: formData,
+                });
+
+                const data = await result.json();
+
+                if(!result.ok){
+                    alert(data.message);
+                    throw new Error(data.error);
+                };
+
+                // IF SELF EDIT
+                if(userInfo._id === user._id){
+                    console.log('Token Remake');
+                    localStorage.setItem('accessToken', data.data.accessToken);
+                    localStorage.setItem('refreshToken', data.data.refreshToken);
+                }
+
+                location.href = `/event/${eventId}/department/${departmentId}/dashboard`;
+                return;
+
+            })
+
+        }
+
+        const editDepartmentAdminCredsButton = adminCredentialsSect.querySelector('#edit-dep-admin-creds-btn');
+        editDepartmentAdminCredsButton.addEventListener('click', async (e) => {
+            e.preventDefault();
+            toggleEditAdminCredentials(adminUser, e.target);
+        })
+
     }
     
 

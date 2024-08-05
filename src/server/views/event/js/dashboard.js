@@ -181,11 +181,68 @@ document.addEventListener('DOMContentLoaded', async () => {
     <td class="py-3 px-4">${adminUser.username}</td>
     <td class="py-3 px-4">${adminUser.password}</td>
     <td class="py-3 px-4">
-        <button class="bg-blue-500 text-white px-2 py-1 rounded" onclick="toggleEditCredentials('UPH_Department_Admin', this)">Edit User Credentials</button>
+        <button id="edit-event-admin-creds-btn" class="bg-blue-500 text-white px-2 py-1 rounded">Edit User Credentials</button>
     </td>
     `;
 
     adminCredsList.appendChild(item);
+
+    // Edit Event Admin Credentials Functionality
+
+    function toggleEditCredentials(user, button) {
+        const container = document.getElementById('editCredentialsContainer');
+        const row = button.closest('tr');
+        if (container.parentNode !== row) {
+            container.remove();
+            row.insertAdjacentElement('afterend', container);
+        }
+        container.classList.toggle('hidden');
+        document.getElementById('newUsername').value = user.username;
+        container.querySelector('#userId-input').value = user._id;
+
+        const submitButton = container.querySelector('#submit-btn');
+        submitButton.addEventListener('click', async (e) => {
+            e.preventDefault();
+
+            // Edit Event Admin Logic
+            const form = container.querySelector('#edit-event-admin-creds-form');
+            const formData = new FormData(form);
+
+            const targetEndpoint = `/api/event/${eventId}/admin`
+            const result = await fetch(targetEndpoint, {
+                method: 'PUT',
+                headers: {
+                    'Authorization' : `Bearer ${accessToken}`,
+                },
+                body: formData,
+            });
+
+            const data = await result.json();
+
+            if(!result.ok){
+                alert(data.message);
+                throw new Error(data.error);
+            }
+
+            
+
+            if(userInfo._id === user._id){
+                console.log('Token Remake');
+                localStorage.setItem('accessToken', data.data.accessToken);
+                localStorage.setItem('refreshToken', data.data.refreshToken);
+            };
+
+            location.href = `/event/${eventId}/dashboard`;
+            return;
+
+        })
+    }
+
+    const editEventAdminCredsButton = item.querySelector('#edit-event-admin-creds-btn');
+    editEventAdminCredsButton.addEventListener('click', async (e) => {
+        e.preventDefault();
+        toggleEditCredentials(adminUser, e.target);
+    })
 
     
     

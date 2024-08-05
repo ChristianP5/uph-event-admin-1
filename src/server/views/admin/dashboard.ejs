@@ -151,7 +151,7 @@
 
         <!-- Edit credentials area -->
         <div class="mt-10 font-bold text-xl flex items-center">
-            <i class="fas fa-user-friends mr-3"></i> Edit Event Admin Credentials
+            <i class="fas fa-user-friends mr-3"></i> Edit Admin Credentials
         </div><br>
         <div class="rounded-lg overflow-auto">
             <table class="min-w-full bg-white">
@@ -180,20 +180,22 @@
 
         <!-- To save new credentials -->
         <div id="editCredentialsContainer" class="mt-4 hidden">
-            <div class="bg-gray-100 ml-1 mb-1 p-4 rounded">
-                <div class="mb-4">
-                    <label for="newUsername" class="block text-sm font-medium text-gray-700">New Username:</label>
-                    <input type="text" id="newUsername" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" placeholder="Enter new username" required>
+            <form id="edit-admin-creds-form" action="">
+                <div class="bg-gray-100 ml-1 mb-1 p-4 rounded">
+                    <div class="mb-4">
+                        <label for="newUsername" class="block text-sm font-medium text-gray-700">New Username:</label>
+                        <input name="username" type="text" id="newUsername" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" placeholder="Enter new username" required>
+                    </div>
+                    <div class="mb-4">
+                        <label for="newPassword" class="block text-sm font-medium text-gray-700">New Password:</label>
+                        <input name="password" type="password" id="newPassword" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" placeholder="Enter new password" required>
+                    </div>
+                    <div class="flex justify-end space-x-2">
+                        <button id="submit-btn" type="button" class="bg-blue-500 text-white px-4 py-2 rounded">Save Changes</button>
+                        <button type="button" class="bg-red-500 text-white px-4 py-2 rounded" onclick="cancelEdit()">Cancel</button>
+                    </div>
                 </div>
-                <div class="mb-4">
-                    <label for="newPassword" class="block text-sm font-medium text-gray-700">New Password:</label>
-                    <input type="password" id="newPassword" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" placeholder="Enter new password" required>
-                </div>
-                <div class="flex justify-end space-x-2">
-                    <button type="button" class="bg-blue-500 text-white px-4 py-2 rounded" onclick="saveCredentials()">Save Changes</button>
-                    <button type="button" class="bg-red-500 text-white px-4 py-2 rounded" onclick="cancelEdit()">Cancel</button>
-                </div>
-            </div>
+            </form>
         </div>
     </div>
     </main>
@@ -277,6 +279,7 @@
             // Add actual edit event logic here
         }
 
+        /*
         function toggleEditCredentials(username, button) {
             const container = document.getElementById('editCredentialsContainer');
             const row = button.closest('tr');
@@ -287,6 +290,7 @@
             container.classList.toggle('hidden');
             document.getElementById('newUsername').value = username;
         }
+        */
 
         function saveCredentials() {
             const username = document.getElementById('newUsername').value.trim();

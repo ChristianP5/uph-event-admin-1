@@ -174,11 +174,67 @@ document.addEventListener('DOMContentLoaded', async () => {
         <td class="py-3 px-4">${adminUser.username}</td>
         <td class="py-3 px-4">${adminUser.password}</td>
         <td class="py-3 px-4">
-            <button disabled class="bg-blue-500 text-white px-2 py-1 rounded" onclick="toggleEditCredentials('UPH_Event_Admin', this)">Edit User Credentials</button>
+            <button id="edit-admin-creds-btn" class="bg-blue-500 text-white px-2 py-1 rounded">Edit User Credentials</button>
         </td>
         `;
 
         adminCredentialsSect.appendChild(item);
+
+        // Edit Admin Credentials Functionality
+        function toggleEditCredentials(user, button) {
+            const container = document.getElementById('editCredentialsContainer');
+            const row = button.closest('tr');
+            if (container.parentNode !== row) {
+                container.remove();
+                row.insertAdjacentElement('afterend', container);
+            }
+            container.classList.toggle('hidden');
+            document.getElementById('newUsername').value = user.username;
+
+            const submitButton = container.querySelector('#submit-btn');
+            submitButton.addEventListener('click', async (e) => {
+                e.preventDefault();
+
+                const form = container.querySelector('#edit-admin-creds-form');
+                const formData = new FormData(form);
+
+                // Edit Admin Credentials Logic
+                const targetEndpoint = `/api/admin/user/${user._id}`;
+                const result = await fetch(targetEndpoint, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization' : `Bearer ${accessToken}`,
+                    },
+                    body: formData,
+                });
+
+                const data = await result.json();
+
+                if(!result.ok){
+                    alert(data.message);
+                    throw new Error(data.error);
+                }
+
+
+                // IF EDITTED using ADMIN, Refresh the Token
+                if(userInfo._id === user._id){
+                    console.log('Token Remake');
+                    localStorage.setItem('accessToken', data.data.accessToken);
+                    localStorage.setItem('refreshToken', data.data.refreshToken);   
+                }
+
+                location.href = '/admin/dashboard';
+                return;
+
+            })
+        }
+
+        const editAdminCredentialsButton = item.querySelector('#edit-admin-creds-btn');
+        editAdminCredentialsButton.addEventListener('click', async (e) => {
+            e.preventDefault();
+            toggleEditCredentials(adminUser, e.target)
+        })
+
     })
 
     // Actions
