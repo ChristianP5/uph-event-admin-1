@@ -1,3 +1,5 @@
+localStorage.setItem('nav-option-active', "home");
+
 /*
 Department DASHBOARD PAGE
     1) Get UserInfo from Token

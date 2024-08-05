@@ -1,3 +1,5 @@
+localStorage.setItem('nav-option-active', "home");
+
 /*
     EDIT DEPARTMENT Page
     2) Determine if either

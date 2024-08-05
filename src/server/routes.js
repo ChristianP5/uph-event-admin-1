@@ -21,7 +21,7 @@ const {
     editDepartmentHandler, getAdminUserHandler, getEditAdminUserPageHandler,
     editAdminUserHandler, deleteFormHandler, deleteDepartmentHandler,
     deleteEventHandler, getEventsHandler, getEventAdminsHandler,
-    postLogoutHandler,
+    postLogoutHandler, getViewEventsPageHandler
 } = require('./handler');
 
 const path = require('path');
@@ -325,6 +325,16 @@ const routes = [
         }
     },
     {
+        path: '/admin/events/view',
+        method: 'GET',
+        handler: getViewEventsPageHandler,
+        options: {
+            auth: {
+                mode: 'try',
+            }
+        }
+    },
+    {
         path: '/admin/user/{userId}/edit',
         method: 'GET',
         handler: getEditAdminUserPageHandler,
@@ -466,7 +476,7 @@ const routes = [
     },
     // Utils
     {
-        path: '/{filename*}',
+        path: '/file/{filename*}',
         method: 'GET',
         handler: {
             directory: {
@@ -483,8 +493,13 @@ const routes = [
     },
     {
         path: '/{any*}',
-        method: '*',
+        method: 'GET',
         handler: getLostHandler,
+        options: {
+            auth: {
+                mode: 'try'
+            }
+        }
     }
 ]
 

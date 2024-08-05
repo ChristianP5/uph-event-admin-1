@@ -751,7 +751,7 @@ const postLoginHandler = async (request, h) => {
 const postLogoutHandler = async (request, h) => {
     const { refreshToken } = request.payload;
 
-    console.log(refreshToken);
+    // console.log(refreshToken);
 
     // 1)
     try{
@@ -853,6 +853,21 @@ const getAdminDashboardPageHandler = async (request, h) => {
     }catch(error){
         throw new LoadingError('Something wrong when Loading Contents');
     }
+}
+
+/*
+    GET VIEW EVENTS PAGE Handler
+    // 1) Get All Events
+    
+*/
+const getViewEventsPageHandler = async (request, h) => {
+    const events = await getAllEvents();
+
+    const data = {
+        events: events,
+    };
+
+    return h.view('admin/viewEvents.ejs', data);
 }
 
 /*
@@ -1769,7 +1784,7 @@ const getCreateResponsePagePageHandler = async (request, h) => {
 const createDepartmentResponseHandler = async (request, h) => {
     const { departmentId, eventId, ratings, formId } = request.payload;
 
-    console.log(request.payload);
+    // console.log(request.payload);
 
     // 1)
     const userInfo = request.auth.credentials._doc;
@@ -1854,5 +1869,6 @@ module.exports = {
     getEditDepartmentPageHandler, editDepartmentHandler, getAdminUserHandler,
     getEditAdminUserPageHandler, editAdminUserHandler,
     deleteFormHandler, deleteDepartmentHandler, deleteEventHandler,
-    getEventsHandler, getEventAdminsHandler, postLogoutHandler
+    getEventsHandler, getEventAdminsHandler, postLogoutHandler,
+    getViewEventsPageHandler
 }

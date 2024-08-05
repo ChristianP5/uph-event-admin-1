@@ -1,3 +1,4 @@
+localStorage.setItem('nav-option-active', "home");
 
 /*
 NEW RESPONSE PAGE

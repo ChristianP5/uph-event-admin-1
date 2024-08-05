@@ -1,3 +1,5 @@
+localStorage.setItem('nav-option-active', "home");
+
 /*
     EDIT EVENT Page
     1) Get User Info

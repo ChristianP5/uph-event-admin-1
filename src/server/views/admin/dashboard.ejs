@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>UPH Survey Hub</title>
-    <link rel="stylesheet" href="/admin/css/styles.css">
+    <link rel="stylesheet" href="/file/admin/css/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
@@ -12,8 +12,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inria+Sans:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&display=swap" rel="stylesheet">
     <!-- IMPORTANT #1 Start -->
-    <script src="/auth/js/getAuthUserInfo.js"></script>
-    <script src="/admin/js/dashboard.js"></script>
+    <script src="/file/auth/js/getAuthUserInfo.js"></script>
+    <script src="/file/admin/js/dashboard.js"></script>
     <!-- IMPORTANT #1 End -->
 </head>
 <body>
@@ -80,8 +80,8 @@
      <!-- PARTIALS END -->
     
      <!-- Main Content area -->
-    <main class="main-content">
-        <div class="content flex-1 pl-6 pr-10 text-[#003366]">
+     <main id="main-content" class="main-content mt-10 transition-all duration-300">
+        <div class="content flex-1 text-[#003366] overflow-auto">
         
         <!-- Current Login Start -->
         <!--
@@ -106,6 +106,7 @@
         <div class="header-text font-bold pt-2 mb-5">
             Admin Dashboard
         </div>
+
         
         <div class="font-bold text-xl flex items-center justify-between">
             <div class="flex items-center">

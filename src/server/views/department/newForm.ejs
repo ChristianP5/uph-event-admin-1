@@ -5,10 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>UPH Survey Hub</title>
     <!-- IMPORTANT #1 Start -->
-    <script src="/auth/js/getAuthUserInfo.js"></script>
-    <script src="/department/js/newForm.js"></script>
+    <script src="/file/auth/js/getAuthUserInfo.js"></script>
+    <script src="/file/department/js/newForm.js"></script>
     <!-- IMPORTANT #1 End -->
-    <link rel="stylesheet" href="/department/css/styles.css">
+    <link rel="stylesheet" href="/file/department/css/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
@@ -22,7 +22,8 @@
       <%- include('../_partials/navbar.ejs') %>
     
      <!-- Main Content area -->
-     <main class="main-content">
+     <main id="main-content" class="main-content mt-10 transition-all duration-300">
+        
         <!-- IMPORTANT #2 Start -->
         <h1 id="event-id" style="display: none"><%= event._id %></h1>
         <h1 id="department-id" style="display: none"><%= department._id %></h1>
@@ -114,16 +115,6 @@
                 x.className += " responsive";
             } else {
                 x.className = "navbar";
-            }
-        }
-
-        function toggleSidebar() {
-            let sidebar = document.querySelector('.sidebar');
-            sidebar.classList.toggle('active');
-            if (sidebar.classList.contains('active')) {
-                sidebar.style.left = '0';
-            } else {
-                sidebar.style.left = '-100%';
             }
         }
 

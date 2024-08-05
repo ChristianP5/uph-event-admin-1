@@ -6,9 +6,9 @@
     <title>UPH Survey Hub</title>
     <!-- IMPORTANT #1 Start -->
     <script src="/file/auth/js/getAuthUserInfo.js"></script>
-    <script src="/file/form/js/dashboard.js"></script>
+    <script src="/file/admin/js/viewEvents.js"></script>
     <!-- IMPORTANT #1 End -->
-    <link rel="stylesheet" href="/file/form/css/styles.css">
+    <link rel="stylesheet" href="/file/admin/css/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
@@ -18,86 +18,58 @@
 </head>
 <body class="bg-gradient-to-b from-white to-blue-100 min-h-screen flex flex-col" style="font-family: Inter, sans-serif">
 
-  <%- include('../_partials/navbar.ejs') %>
-  <!-- IMPORTANT #2 Start -->
-  <p id="event-id" style="display: none;"><%= event._id %></p>
-  <p id="department-id" style="display: none;"><%= department._id %></p>
-  <p id="form-id" style="display: none;"><%= form._id %></p>
-  <p id="form-name" style="display: none;"><%= form.name %></p>
-  <!-- IMPORTANT #2 End -->
+    <%- include('../_partials/navbar.ejs') %>
 
     <!-- Main Content area -->
     <main id="main-content" class="main-content mt-10 transition-all duration-300">
         <div class="content flex-1 text-[#003366] overflow-auto">
-            <!-- Current Login Start -->
-            <%- include('../_partials/currentLogin.ejs') %>
-            <!-- Current Login End -->
-            
-            <!-- Breadcrumbs Start -->
-            <%- include('../_partials/breadcrumb.ejs') %>
-            <!-- Breadcurmbs End -->
 
-            <div class="header-text pt-2">
-                <%= department.name %>
-            </div>
+            <%- include('../_partials/currentLogin.ejs') %>
+            
+            <%- include('../_partials/breadcrumb.ejs') %>
+
+            <br>
+            
             <!-- Edit Content area -->
             <div class="font-bold text-xl flex items-center justify-between">
                 <div class="flex items-center">
-                    <i class="fas fa-file-alt mr-3"></i> <%= form.name %>
+                    <i class="fas fa-calendar mr-3"></i> Events
                 </div>
-                <div class="event-buttons mt-2 flex space-x-2">
-                  <button id="export-response-btn" class="bg-green-500 text-white px-2 py-1 rounded flex items-center space-x-1">
-                      <i class="fas fa-share-from-square"></i>
-                      <span class="text-sm">Export Responses</span>
-                  </button>
-                  <button class="bg-blue-500 text-white px-2 py-1 rounded flex items-center space-x-1" onclick="location.href = '/event/<%= event._id %>/department/<%= department._id %>/form/<%= form._id %>/response/new'">
-                      <i class="fas fa-plus"></i>
-                      <span class="text-sm">Add Responses</span>
-                  </button>
-              </div>
+            </div>
+            <div class="mt-2 text-center">
+                <button class="bg-yellow-500 text-white px-2 py-1 rounded flex items-center space-x-1" onclick="location.href='/admin/event/new'">
+                    <i class="fas fa-plus"></i>
+                    <span class="text-sm"> Create Event</span>
+                </button>
             </div><br>
-
+    
             <div class="rounded-lg overflow-auto">
                 <table class="min-w-full">
-                    <thead>
-                        <tr>
-                            <th class="py-2 px-4 text-left">Response ID</th>
-                            <% let questionCount = 0; %>
-                            <% form.questions.forEach(question => {
-                              questionCount += 1;
-                              %>
-                              <th class="py-2 px-4 text-left">Question <%= questionCount %></th>
-                              <%
-                            }) %>
-                        </tr>
-                    </thead>
-                    <tbody>
-                      
-                       <% responses.forEach(response => { %>
+                    <tbody id="main-list">
+                        <!-- Item Design Start -->
+                         <!--
                         <tr class="border-t border-[#AAC1D7] hover:bg-[#E5EDF4] hover:shadow-lg">
-                            <td class="py-3 px-4"><%= response._id %></td>
-                            <% response.ratings.forEach(rating => { %>
-                              <td class="py-3 px-4"><%= rating %></td>
-                            
-                            <% }) %>
+                            <td class="py-3 px-4">
+                                <div class="event-name-wrapper">
+                                    <a href="ea-acs2024.html" class="text-blue-600 underline event-name">UPH Academic Showcase 2024</a>
+                                </div>
+                                <div class="event-buttons mt-2 flex space-x-2">
+                                    <button class="bg-blue-500 text-white px-2 py-1 rounded flex items-center space-x-1" onclick="editEvent('')">
+                                        <i class="fas fa-edit"></i>
+                                        <span class="text-sm">Edit Event</span>
+                                    </button>   
+                                    <button class="bg-red-500 text-white px-2 py-1 rounded flex items-center space-x-1" onclick="confirmDeleteEvent('')">
+                                        <i class="fas fa-trash"></i>
+                                        <span class="text-sm">Delete Event</span>
+                                    </button>
+                                </div>
+                            </td>
                         </tr>
-                        <%
-                       }) %>
-                       <!-- Item Design Start -->
-                        <!--
-                       <tr class="border-t border-[#AAC1D7] hover:bg-[#E5EDF4] hover:shadow-lg">
-                          <td class="py-3 px-4">JkOinNhIhbJhyNFedFVbB1988HNHTjnnjYHMkjing918</td>
-                          <td class="py-3 px-4">5</td>
-                          <td class="py-3 px-4">3</td>
-                          <td class="py-3 px-4">4</td>
-                      </tr>
-                      -->
+                        -->
                         <!-- Item Design End -->
                     </tbody>
                 </table>
-            </div>
-
-            
+            </div><br>
     </main>
 
     <!-- Delete Event Popup -->
@@ -135,14 +107,7 @@
             }
         }
 
-
-        function confirmDeleteEvent(eventName) {
-            document.getElementById('deletePopupOverlay').style.display = 'block';
-            document.getElementById('deletePopup').style.display = 'block';
-            document.getElementById('confirmDeleteButton').onclick = function() {
-                deleteEvent(eventName);
-            };
-        }
+        
 
         function hideDeletePopup() {
             document.getElementById('deletePopupOverlay').style.display = 'none';

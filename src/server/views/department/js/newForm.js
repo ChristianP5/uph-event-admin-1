@@ -1,3 +1,4 @@
+localStorage.setItem('nav-option-active', "home");
 
 /*
 NEW FORM PAGE
@@ -74,7 +75,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         */
 
         item.innerHTML = `
-            <label for="input-question-${questionCount}" class="block text-sm font-medium text-gray-700">Question 1:</label>
+            <label for="input-question-${questionCount}" class="block text-sm font-medium text-gray-700">Question:</label>
             <input name="questions" type="text" id="input-question-${questionCount}" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" placeholder="Question" required>
             <button type="button" class="bg-red-500 text-white px-4 py-2 rounded remove-question-btn">Remove Question</button>
         `;
