@@ -73,8 +73,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             <div class="event-name-wrapper">
                 <a href="/event/${event._id}/dashboard" class="text-blue-600 underline event-name">${event.name}</a>
             </div>
-            <div class="event-buttons mt-2 flex space-x-2">
-                <button disabled class="bg-blue-500 text-white px-2 py-1 rounded flex items-center space-x-1" onclick="editEvent('${event.name}')">
+            <div  class="event-buttons mt-2 flex space-x-2">
+                <button id="edit-event-btn" class="bg-blue-500 text-white px-2 py-1 rounded flex items-center space-x-1">
                     <i class="fas fa-edit"></i>
                     <span class="text-sm">Edit Event</span>
                 </button>   
@@ -86,6 +86,16 @@ document.addEventListener('DOMContentLoaded', async () => {
         </td>
         `;
         eventsList.appendChild(item);
+
+        // Edit Event Functionality
+        const editButton = item.querySelector('#edit-event-btn');
+        editButton.addEventListener('click', async (e) => {
+            e.preventDefault();
+            editButton.disabled = true;
+
+            location.href = `/event/${event._id}/edit`
+            return;
+        })
 
         // Delete Event Functionality (with Confirmation)
             function confirmDeleteEvent(eventId) {

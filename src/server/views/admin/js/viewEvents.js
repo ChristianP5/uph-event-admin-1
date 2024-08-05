@@ -56,7 +56,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         item.innerHTML = `
         <td class="py-3 px-4">
             <div class="event-name-wrapper">
-                <a href="ea-acs2024.html" class="text-blue-600 underline event-name">${eventItem.name}</a>
+                <a href="/event/${eventItem._id}/dashboard" class="text-blue-600 underline event-name">${eventItem.name}</a>
             </div>
             <div class="event-buttons mt-2 flex space-x-2">
                 <button class="bg-blue-500 text-white px-2 py-1 rounded flex items-center space-x-1" onclick="editEvent('')">

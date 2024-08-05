@@ -83,7 +83,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                      <a href="/event/${eventId}/department/${department._id}/dashboard" class="text-blue-600 underline event-name">${department.name}</a>
             </div>
             <div class="event-buttons mt-2 flex space-x-2">
-                <button class="bg-blue-500 text-white px-2 py-1 rounded flex items-center space-x-1" onclick="location.href='ea-department-forms.html'">
+                <button id="edit-department-btn" class="bg-blue-500 text-white px-2 py-1 rounded flex items-center space-x-1" onclick="location.href='ea-department-forms.html'">
                     <i class="fas fa-edit"></i>
                     <span class="text-sm">Edit Department</span>
                 </button>   
@@ -96,6 +96,17 @@ document.addEventListener('DOMContentLoaded', async () => {
         `;
 
         departmentsList.appendChild(item);
+
+        // Edit Functionality
+        const editButton = item.querySelector('#edit-department-btn');
+        editButton.addEventListener('click', async (e) => {
+            e.preventDefault();
+            editButton.disabled = true;
+
+            location.href = `/event/${eventId}/department/${department._id}/edit`;
+            return;
+
+        })
 
         // Delete Functionaility (with Confirmation)
             function confirmDeleteDepartment(departmentId) {
