@@ -33,6 +33,8 @@ const deleteEvent = require("../services/events/deleteEvent");
 const deleteUserByEventId = require("../services/users/deleteUserByEventId");
 const deleteRefreshToken = require("../services/auth/deleteRefreshToken");
 
+const LoadingError = require('./exceptions/LoadingError');
+
 const getRootHandler = (request, h) => {
 
     return h.redirect('/authorization');
@@ -99,19 +101,24 @@ const getDepartmentAdminHandler = async (request, h) => {
 const getEditDepartmentPageHandler = async (request, h) => {
     const {eventId, departmentId} = request.params;
 
-    // 1)
-    const event = await getEventById(eventId);
+    try{
+        // 1)
+        const event = await getEventById(eventId);
 
-    // 2)
-    const department = await getDepartmentById(departmentId);
+        // 2)
+        const department = await getDepartmentById(departmentId);
 
-    // 3)
-    const data = {
-        event: event,
-        department: department,
-    };
+        // 3)
+        const data = {
+            event: event,
+            department: department,
+        };
 
-    return h.view('event/editDepartment.ejs', data);
+        return h.view('event/editDepartment.ejs', data);
+
+    }catch(error){
+        throw new LoadingError('Something wrong when Loading Contents');
+    }
 };
 
 /*
@@ -284,22 +291,27 @@ const editDepartmentUserHandler = async (request, h) => {
 const getEditDepartmentUserPageHandler = async (request, h) => {
     const { eventId, departmentId, userId } = request.params;
 
-    // 1)
-    const event = await getEventById(eventId);
+    try{
+        // 1)
+        const event = await getEventById(eventId);
 
-    // 2)
-    const department = await getDepartmentById(departmentId);
+        // 2)
+        const department = await getDepartmentById(departmentId);
 
-    // 3)
-    const user = await getUserById(userId);
+        // 3)
+        const user = await getUserById(userId);
 
-    const data = {
-        event: event,
-        department: department,
-        user: user,
-    };
+        const data = {
+            event: event,
+            department: department,
+            user: user,
+        };
 
-    return h.view('department/editUser.ejs', data);
+        return h.view('department/editUser.ejs', data);
+        
+    }catch(error){
+        throw new LoadingError('Something wrong when Loading Contents');
+    }
 }
 
 /*
@@ -423,15 +435,19 @@ const deleteEventHandler = async (request, h) => {
 const getEditEventPageHandler = async (request, h) => {
     const { eventId } = request.params;
 
-    // 1)
-    const event = await getEventById(eventId);
+    try{
+        // 1)
+        const event = await getEventById(eventId);
 
-    // 2)
-    const data = {
-        event: event,
-    };
+        // 2)
+        const data = {
+            event: event,
+        };
 
-    return h.view('event/editEvent.ejs', data);
+        return h.view('event/editEvent.ejs', data);
+    }catch(error){
+        throw new LoadingError('Something wrong when Loading Contents');
+    }
 
 }
 
@@ -824,15 +840,19 @@ const getAuthUserHandler = async (request, h) => {
 
 const getAdminDashboardPageHandler = async (request, h) => {
     
-    // 1)
-    const events = await getAllEvents();
+    try{
+        // 1)
+        const events = await getAllEvents();
 
-    // 2)
-    const data = {
-        events
+        // 2)
+        const data = {
+            events
+        }
+
+        return h.view('admin/dashboard.ejs', data);
+    }catch(error){
+        throw new LoadingError('Something wrong when Loading Contents');
     }
-
-    return h.view('admin/dashboard.ejs', data);
 }
 
 /*
@@ -879,15 +899,20 @@ const getAdminUserHandler= async (request, h) => {
 */
 const getEditAdminUserPageHandler = async (request, h) => {
     const { userId } = request.params;
-    // 1)
-    const user = await getUserById(userId);
+    
+    try{
+        // 1)
+        const user = await getUserById(userId);
 
-    // 2)
-    const data = {
-        user : user,
-    };
+        // 2)
+        const data = {
+            user : user,
+        };
 
-    return h.view('admin/editAdminUser.ejs', data);
+        return h.view('admin/editAdminUser.ejs', data);
+    }catch(error){
+        throw new LoadingError('Something wrong when Loading Contents');
+    }
 }
 
 /*
@@ -1074,23 +1099,28 @@ const getEventByIdHandler = async (request, h) => {
 const getEventDashboardPageHandler = async (request, h) => {
     const { eventId } = request.params;
 
-    // 1)
-    const event = await getEventById(eventId);
+    try{
 
-    // 2)
-    const departments = await getDepartmentsByEventId(eventId);
+        // 1)
+        const event = await getEventById(eventId);
 
-    // 3)
-    const adminUser = await getUserByEventId(eventId);
+        // 2)
+        const departments = await getDepartmentsByEventId(eventId);
 
-    const data = {
-        eventId : event._id,
-        eventName : event.name,
-        departments: departments,
-        adminUser: adminUser,
-    };
+        // 3)
+        const adminUser = await getUserByEventId(eventId);
 
-    return h.view('event/dashboard.ejs', data);
+        const data = {
+            eventId : event._id,
+            eventName : event.name,
+            departments: departments,
+            adminUser: adminUser,
+        };
+
+        return h.view('event/dashboard.ejs', data);
+    }catch(error){
+        throw new LoadingError('Something wrong when Loading Contents');
+    }
     
 }
 
@@ -1143,19 +1173,26 @@ const getEventAdminsHandler = async (request, h) => {
 */
 const getEditEventAdminPageHandler = async (request, h) => {
     const {eventId} = request.params;
-    // 1)
-    const event = await getEventById(eventId);
 
-    // 2)
-    const eventAdmin = await getUserByEventId(eventId);
+    try{
+            
+        // 1)
+        const event = await getEventById(eventId);
 
-    // 3)
-    const data = {
-        event: event,
-        eventAdmin: eventAdmin,
-    };
+        // 2)
+        const eventAdmin = await getUserByEventId(eventId);
 
-    return h.view('event/editAdminUser.ejs', data);
+        // 3)
+        const data = {
+            event: event,
+            eventAdmin: eventAdmin,
+        };
+
+        return h.view('event/editAdminUser.ejs', data);
+
+    }catch(error){
+        throw new LoadingError('Something wrong when Loading Contents');
+    }
 }
 
 /*
@@ -1239,23 +1276,29 @@ const createDepartmentHandler = async (request, h) => {
 const getEditDepartmentAdminPageHandler = async (request, h) => {
     const { eventId, departmentId } = request.params;
     
-    // 1)
-    const event = await getEventById(eventId);
+    try{
 
-    // 2)
-    const department = await getDepartmentById(departmentId);
+        // 1)
+        const event = await getEventById(eventId);
 
-    // 3)
-    const user = await getUsersByDepartmentId(departmentId, "admin");
+        // 2)
+        const department = await getDepartmentById(departmentId);
 
-    // 4)
-    const data = {
-        event: event,
-        department: department,
-        user: user[0],
-    };
+        // 3)
+        const user = await getUsersByDepartmentId(departmentId, "admin");
 
-    return h.view('department/editAdminUser.ejs', data);
+        // 4)
+        const data = {
+            event: event,
+            department: department,
+            user: user[0],
+        };
+
+        return h.view('department/editAdminUser.ejs', data);
+
+    }catch(error){
+        throw new LoadingError('Something wrong when Loading Contents');
+    }
     
 }
 
@@ -1346,30 +1389,36 @@ const getDepartmentsByEventIdHandler = async (request, h) => {
 const getDepartmentDashboardPageHandler = async (request, h) => {
     const { eventId, departmentId } = request.params;
 
-    // 1)
-    const event = await getEventById(eventId);
+    try{
 
-    // 2)
-    const department = await getDepartmentById(departmentId);
+        // 1)
+        const event = await getEventById(eventId);
 
-    // 3)
-    const forms = await getFormsByDepartmentId(departmentId);
+        // 2)
+        const department = await getDepartmentById(departmentId);
 
-    // 4)
-    const users = await getUsersByDepartmentId(departmentId);
+        // 3)
+        const forms = await getFormsByDepartmentId(departmentId);
 
-    // 5) 
-    const adminUser = await getUsersByDepartmentId(departmentId, "admin");
+        // 4)
+        const users = await getUsersByDepartmentId(departmentId);
 
-    const data = {
-        event: event,
-        department: department,
-        forms: forms,
-        users: users,
-        adminUser: adminUser[0],
-    };
+        // 5) 
+        const adminUser = await getUsersByDepartmentId(departmentId, "admin");
 
-    return h.view('department/dashboard.ejs', data);
+        const data = {
+            event: event,
+            department: department,
+            forms: forms,
+            users: users,
+            adminUser: adminUser[0],
+        };
+
+        return h.view('department/dashboard.ejs', data);
+
+    }catch(error){
+        throw new LoadingError('Something wrong when Loading Contents');
+    }
 }
 
 /*
@@ -1430,16 +1479,22 @@ const createFormHandler = async (request, h) => {
 const getNewFormPageHandler = async (request, h) => {
     const {eventId, departmentId} = request.params;
 
-    // 1)
-    const event = await getEventById(eventId);
-    const department = await getDepartmentById(departmentId);
+    try{
 
-    const data = {
-        event: event,
-        department: department,
-    };
+        // 1)
+        const event = await getEventById(eventId);
+        const department = await getDepartmentById(departmentId);
 
-    return h.view("department/newForm.ejs", data);
+        const data = {
+            event: event,
+            department: department,
+        };
+
+        return h.view("department/newForm.ejs", data);
+
+    }catch(error){
+        throw new LoadingError('Something wrong when Loading Contents');
+    }
 }
 
 /*
@@ -1568,17 +1623,23 @@ const deleteFormHandler = async (request, h) => {
 const getNewUserPageHandler = async (request, h) => {
     const { eventId, departmentId } = request.params;
 
-    // 1)
-    const department = await getDepartmentById(departmentId);
-    const event = await getEventById(eventId);
+    try{
 
-    const data = {
-        department: department,
-        event: event,
-    };
+        // 1)
+        const department = await getDepartmentById(departmentId);
+        const event = await getEventById(eventId);
 
-    // 2)
-    return h.view('department/newUser.ejs', data);
+        const data = {
+            department: department,
+            event: event,
+        };
+
+        // 2)
+        return h.view('department/newUser.ejs', data);
+
+    }catch(error){
+        throw new LoadingError('Something wrong when Loading Contents');
+    }
 }
 
 /*
@@ -1631,26 +1692,32 @@ const createDepartmentMemberHandler = async (request, h) => {
 const getFormPagePageHandler = async (request, h) => {
     const { eventId, departmentId, formId } = request.params;
 
-    // 1)
-    const event = await getEventById(eventId);
-    
-    // 2)
-    const department = await getDepartmentById(departmentId);
+    try{
 
-    // 3)
-    const form = await getFormById(formId);
+        // 1)
+        const event = await getEventById(eventId);
+        
+        // 2)
+        const department = await getDepartmentById(departmentId);
 
-    // 4)
-    const responses = await getResponsesByFormId(formId);
+        // 3)
+        const form = await getFormById(formId);
 
-    const data = {
-        event: event,
-        department: department,
-        form: form,
-        responses: responses,
+        // 4)
+        const responses = await getResponsesByFormId(formId);
+
+        const data = {
+            event: event,
+            department: department,
+            form: form,
+            responses: responses,
+        }
+
+        return h.view('form/dashboard.ejs', data);
+
+    }catch(error){
+        throw new LoadingError('Something wrong when Loading Contents');
     }
-
-    return h.view('form/dashboard.ejs', data);
 }
 
 /*
@@ -1664,23 +1731,29 @@ const getFormPagePageHandler = async (request, h) => {
 const getCreateResponsePagePageHandler = async (request, h) => {
     const { eventId, departmentId, formId } = request.params;
     
-    // 1)
-    const event = await getEventById(eventId);
+    try{
 
-    // 2)
-    const department = await getDepartmentById(departmentId);
+        // 1)
+        const event = await getEventById(eventId);
 
-    // 3)
-    const form = await getFormById(formId);
+        // 2)
+        const department = await getDepartmentById(departmentId);
 
-    // 4)
-    const data = {
-        event: event,
-        department: department,
-        form: form,
+        // 3)
+        const form = await getFormById(formId);
+
+        // 4)
+        const data = {
+            event: event,
+            department: department,
+            form: form,
+        }
+
+        return h.view('form/createResponse.ejs', data);
+
+    }catch(error){
+        throw new LoadingError('Something wrong when Loading Contents');
     }
-
-    return h.view('form/createResponse.ejs', data);
 
 }
 

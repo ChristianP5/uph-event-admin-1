@@ -6,6 +6,7 @@ const getUserById = require('../services/users/getUserById');
 const getUserByCredentials = require('../services/users/getUserByCredentials');
 const getDepartmentById = require('../services/departments/getDepartmentById');
 const getEventById = require('../services/events/getEventById');
+const LoadingError = require('./exceptions/LoadingError');
 
 dotenv.config();
 
@@ -66,6 +67,7 @@ const init = async ()=>{
                 }
 
                 // Relogin if Event/Department is Removed
+                /* 
                 const userRole = user.role;
                 const [department_id, event_id, access_level] = userRole.split('/');
 
@@ -84,6 +86,7 @@ const init = async ()=>{
                         throw new Error('Invalid Event!');
                     };
                 };
+                */
 
             }catch(error){
                 return {
@@ -111,7 +114,10 @@ const init = async ()=>{
     server.ext('onPreResponse',(request, h)=>{
         const response = request.response;
 
-        if(response instanceof Error){
+        if(response instanceof LoadingError){
+            
+            return h.redirect('/authorization');
+        }else if(response instanceof Error){
             
             // console.error(response);
             const newResponse = h.response({
