@@ -1,0 +1,116 @@
+<!-- PARTIALS START -->
+      <!-- Navbar Start -->
+      <nav class="navbar bg-gradient-to-r from-[#003366] to-[#0066CC]" id="myNavbar">
+        <button class="sidebar-btn" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+        <div class="navbar-title-img flex justify-center items-center">
+            <img src="/_partials/images/logouph.svg" alt="UPH Logo" class="h-20">
+            <div class="header text-white text-xl pb-2 pl-3" style="font-family: Inter, sans-serif">Survey Hub</div>
+        </div>
+            <button class="profile-icon flex items-center" onclick="showLogoutPopup()">
+                <i class="fas fa-sign-out"></i>
+                <span style="font-family: Inter, sans-serif; margin-left: 5px; margin-bottom: 5px;">Logout</span>
+                <a href="javascript:void(0);" class="icon" onclick="hideLogoutPopup()"></a>
+            </button>
+            </a>
+        </a>
+    </nav>
+    <!-- Navbar End -->
+
+<!-- Logout Popup Start -->
+<div class="popup-overlay" id="popupOverlay" onclick="hideLogoutPopup()"></div>
+    <div class="logout-popup" id="logoutPopup">
+        <p>Are you sure you want to logout?</p>
+        <button class="popup-button cancel" onclick="hideLogoutPopup()">Cancel</button>
+        
+        <!-- Logout Button Start-->
+        <button id="logout-btn" class="popup-button logout">Logout</button>
+        <!-- Logout Button End-->
+    </div>
+</div>
+<!-- Logout Popup Start -->
+
+<!-- Sidebar Start -->
+<aside class="sidebar bg-gradient-to-r from-[#003366] to-[#0066CC]"><br><br>
+    <div class="sidebar-logo my-1 mr-3 text-center"><br>
+        <img src="/_partials/images/logouph.svg" alt="Logo">
+    </div>
+    <div class="sidebar-menu flex flex-col gap-2 p-2">
+        <div class="sidebar-item border-t border-[#AAC1D7] hover:bg-[#0066CC] hover:shadow-lg">
+            <a href="/authorization" class="block text-white font-bold">
+                <i class="fas fa-home p-2"></i>Home
+            </a>
+        </div>
+        <div class="sidebar-item border-t border-[#AAC1D7] hover:bg-[#0066CC] hover:shadow-lg">
+            <a href="ea-events.html" class="block text-white font-bold">
+                <i class="fas fa-calendar p-2"></i>Events
+            </a>
+        </div>
+    </div>
+    <div class="mt-auto p-4 w-full">
+            <button class="logout-btn" onclick="showLogoutPopup()">
+                <i class="fas fa-sign-out-alt mr-2"></i> Logout</button>
+                <a href="javascript:void(0);" class="icon" onclick="hideLogoutPopup()"></a>
+        </div>
+</aside>
+<!-- Sidebar End -->
+
+<!-- Nav Scripts Start -->
+ <script>
+    function showLogoutPopup() {
+            document.getElementById('logoutPopup').style.display = 'block';
+            document.getElementById('popupOverlay').style.display = 'block';
+        }
+
+        function hideLogoutPopup() {
+            document.getElementById('logoutPopup').style.display = 'none';
+            document.getElementById('popupOverlay').style.display = 'none';
+        }
+
+        function toggleSidebar() {
+            let sidebar = document.querySelector('.sidebar');
+            sidebar.classList.toggle('active');
+            if (sidebar.classList.contains('active')) {
+                sidebar.style.left = '0';
+            } else {
+                sidebar.style.left = '-100%';
+            }
+        }
+
+        const logoutButton = document.getElementById('logout-btn');
+        logoutButton.addEventListener('click', async (e) => {
+            e.preventDefault();
+
+            const refreshToken = localStorage.getItem('refreshToken');
+            const accessToken = localStorage.getItem('accessToken');
+
+            const body = JSON.stringify({ refreshToken: refreshToken });
+
+            localStorage.clear();
+
+            // TODO : Add Delete Refresh Token API
+            const targetEndpoint = "/auth/logout";
+            const result = await fetch(targetEndpoint, {
+                method: 'POST',
+                headers: {
+                    'Authorization' : `Bearer ${accessToken}`,
+                    'Content-type': 'application/json',
+                },
+                body: body
+            })
+
+            const data = await result.json();
+
+            if(!result.ok){
+                alert(data.message);
+                throw new Error(data.error);
+            }
+
+            console.log(data);
+
+            location.href = "/login";
+            return;
+        })
+ </script>
+ <!-- Nav Scripts End -->
+
+ <!-- PARTIALS END -->

@@ -1,0 +1,11 @@
+<div class="text-gray-600 text-sm mb-2">
+  <b class="text-[#003366]"
+    >You're logged in as: <span id="current-user">UPH_Event_Admin</span></b
+  >
+</div>
+<script>
+  const currentUserText = document.getElementById("current-user");
+  getAuthUserInfo().then((userInfo) => {
+    currentUserText.textContent = userInfo.username;
+  });
+</script>

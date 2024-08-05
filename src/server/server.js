@@ -112,6 +112,7 @@ const init = async ()=>{
         const response = request.response;
 
         if(response instanceof Error){
+            
             // console.error(response);
             const newResponse = h.response({
                 status: 'fail',
@@ -121,6 +122,7 @@ const init = async ()=>{
 
             newResponse.code(500);
             return newResponse;
+            
         }
 
         return h.continue;

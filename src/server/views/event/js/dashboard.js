@@ -27,6 +27,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     /*
         a) Get Departments of Event
         b) Display Departments of Event
+        c) Get Event Admin
+        d) Display Admin of Event
     */
 
     // a)
@@ -47,11 +49,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const departments = data.data.departments;
 
+    // b)
     const departmentsList = document.getElementById('main-list');
     departments.forEach(department => {
-        console.log('Working');
-        const item = document.createElement('div');
-        item.classList = "row mt-2";
+        const item = document.createElement('tr');
+        item.classList = "border-t border-[#AAC1D7] hover:bg-[#E5EDF4] hover:shadow-lg";
+
+        // Old
+        /*
         item.innerHTML = `
         <div class="col d-flex">
           <a
@@ -68,33 +73,106 @@ document.addEventListener('DOMContentLoaded', async () => {
           >
         </div>
         `;
+        */
+
+        item.innerHTML = `
+        <td class="py-3 px-4">
+            <div class="event-name-wrapper">
+                     <a href="/event/${eventId}/department/${department._id}/dashboard" class="text-blue-600 underline event-name">${department.name}</a>
+            </div>
+            <div class="event-buttons mt-2 flex space-x-2">
+                <button class="bg-blue-500 text-white px-2 py-1 rounded flex items-center space-x-1" onclick="location.href='ea-department-forms.html'">
+                    <i class="fas fa-edit"></i>
+                    <span class="text-sm">Edit Department</span>
+                </button>   
+                <button id="delete-department-btn" class="bg-red-500 text-white px-2 py-1 rounded flex items-center space-x-1"">
+                    <i class="fas fa-trash"></i>
+                    <span class="text-sm">Delete Department</span>
+                </button>
+            </div>
+        </td>
+        `;
 
         departmentsList.appendChild(item);
 
-        const deleteButton = item.querySelector('.delete-department-btn');
-        deleteButton.addEventListener('click', async (e) => {
-            e.preventDefault();
+        // Delete Functionaility (with Confirmation)
+            function confirmDeleteDepartment(departmentId) {
+                document.getElementById('deletePopupOverlay').style.display = 'block';
+                document.getElementById('deletePopup').style.display = 'block';
+                document.getElementById('confirmDeleteButton').onclick = async () => {
+                    
+                    const targetEndpoint = `/api/events/${eventId}/departments/${departmentId}`;
+                    const result = await fetch(targetEndpoint, {
+                        method: 'DELETE',
+                        headers: {
+                            'Authorization' : `Bearer ${accessToken}`,
+                        },
+                    });
 
-            const targetEndpoint = `/api/events/${eventId}/departments/${department._id}`;
-            const result = await fetch(targetEndpoint, {
-                method: 'DELETE',
-                headers: {
-                    'Authorization' : `Bearer ${accessToken}`,
-                },
-            });
+                    const data = await result.json();
 
-            const data = await result.json();
+                    if(!result.ok){
+                        alert(data.message);
+                        throw new Error(data.error);
+                    }
 
-            if(!result.ok){
-                alert(data.message);
-                throw new Error(data.error);
+                    location.href = `/event/${eventId}/dashboard`;
+                    return;
+                };
             }
+            
+            const deleteButton = item.querySelector('#delete-department-btn');
+            deleteButton.addEventListener('click', async (e) => {
+                e.preventDefault();
 
-            location.href = `/event/${eventId}/dashboard`;
-            return;
+                confirmDeleteDepartment(department._id);
 
-        })
+            })
+        
     })
+
+    // c)
+    const getAdminCredentials_targetEndpoint = `/event/${eventId}/admin/users`;
+    const getAdminCredentials_result = await fetch(getAdminCredentials_targetEndpoint, {
+        method: 'GET',
+        headers: {
+            'Authorization' : `Bearer ${accessToken}`,
+        }
+    });
+
+    const getAdminCredentials_data = await getAdminCredentials_result.json();
+
+    if(!getAdminCredentials_result.ok){
+        alert(getAdminCredentials_data.message);
+        throw new Error(getAdminCredentials_data.error);
+    }
+
+    const adminUser = getAdminCredentials_data.data.users;
+
+
+    // d)
+    const adminCredsList = document.getElementById('admin-credentials-list');
+
+    const item = document.createElement('tr');
+    item.classList = "border-t border-[#AAC1D7] hover:bg-[#E5EDF4] hover:shadow-lg";
+    
+    // Old
+    /*
+    item.innerHTML = `
+        <td>${adminUser.username}</td>
+        <td>${adminUser.password}</td>
+    `;
+    */
+
+    item.innerHTML = `
+    <td class="py-3 px-4">${adminUser.username}</td>
+    <td class="py-3 px-4">${adminUser.password}</td>
+    <td class="py-3 px-4">
+        <button class="bg-blue-500 text-white px-2 py-1 rounded" onclick="toggleEditCredentials('UPH_Department_Admin', this)">Edit User Credentials</button>
+    </td>
+    `;
+
+    adminCredsList.appendChild(item);
 
     
     

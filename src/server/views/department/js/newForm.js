@@ -45,7 +45,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         const questionsList = document.getElementById('questions-list');
         const item = document.createElement('div');
-        item.classList = "row mt-2";
+        item.classList = "mb-4";
+
+        // Old
+        /*
         item.innerHTML = 
         `
             <div class="col">
@@ -67,20 +70,30 @@ document.addEventListener('DOMContentLoaded', async () => {
               </button>
             </div>
         `;
+
+        */
+
+        item.innerHTML = `
+            <label for="input-question-${questionCount}" class="block text-sm font-medium text-gray-700">Question 1:</label>
+            <input name="questions" type="text" id="input-question-${questionCount}" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" placeholder="Question" required>
+            <button type="button" class="bg-red-500 text-white px-4 py-2 rounded remove-question-btn">Remove Question</button>
+        `;
+
         questionsList.appendChild(item);
         setRemoveQuestionButtonsListeners();
     })
 
     // b)
     const setRemoveQuestionButtonsListeners = () => {
-        const removeQuestionButtons = document.querySelectorAll('.btn.btn-danger.remove-question');
+        const removeQuestionButtons = document.querySelectorAll('.remove-question-btn');
         removeQuestionButtons.forEach(removeQuestionButton => {
             removeQuestionButton.addEventListener('click', async (e) => {
                 e.preventDefault();
 
                 const questionsList = document.getElementById('questions-list');
 
-                const removedElement = e.target.parentElement.parentElement;
+                const removedElement = e.target.parentElement;
+                
                 questionsList.removeChild(removedElement);
                 questionCount -= 1;
                 

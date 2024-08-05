@@ -11,11 +11,12 @@ const getUserByEventId = async (eventId) => {
             const userRole = user.role;
             const [department_id, event_id, access_level] = userRole.split('/');
 
-            if(event_id === eventId && access_level === "admin"){
+            if(department_id === "admin" && event_id === eventId && access_level === "admin"){
                 return true;
             }
         } );
 
+        // NEXT: Make this function return an Array
         const adminUser = filteredUsers[0];
 
         return adminUser;

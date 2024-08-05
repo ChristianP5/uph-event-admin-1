@@ -30,11 +30,11 @@
     class="h-screen flex flex-col bg-gradient-to-r from-[#003366] to-[#0066CC]"
     style="font-family: Inter, sans-serif"
   >
-    <!-- IMPORTANT #2 START -->
-    <h1 id="event-id" style="display: none;"><%= event._id %></h1>
-    <h1 id="department-id" style="display: none;"><%= department._id %></h1>
-    <h1 id="form-id" style="display: none;"><%= form._id %></h1>
-    <!-- IMPORTANT #2 END -->
+  <!-- For Backend #2 START -->
+  <h1 id="event-id" style="display: none;"><%= event._id %></h1>
+  <h1 id="department-id" style="display: none;"><%= department._id %></h1>
+  <h1 id="form-id" style="display: none;"><%= form._id %></h1>
+  <!-- For Backend #2 END -->
     <img
       src="/form/images/background.jpg"
       class="absolute z-0 h-screen w-screen object-cover opacity-[25%]"
@@ -47,7 +47,10 @@
     </nav>
     <!-- Main content -->
     <main class="flex flex-grow items-center justify-center mb-24 px-12 z-20">
-      <!-- IMPORTANT #3 START (form MUST contain id="main-form") -->
+      <!--
+        For Backend Modifications:
+          - Changed id to "main-form"
+      -->
       <form
         action=""
         method="POST"
@@ -56,9 +59,7 @@
         class="relative w-full"
         data-carousel="static"
       >
-        <!-- IMPORTANT #3 END -->
-
-        <!-- IMPORTANT #4 START -->
+        <!-- For Backend #3 Start -->
         <input type="hidden" name="eventId" value="<%= event._id %>" />
         <input
           type="hidden"
@@ -66,103 +67,19 @@
           value="<%= department._id %>"
         />
         <input type="hidden" name="formId" value="<%= form._id %>" />
-        <!-- IMPORTANT #4 END -->
+        <!-- For Backend #3 End -->
 
-        <!-- Carousel wrapper -->
+        <!-- Carousel Wrapper Start-->
         <div
           class="relative h-[70vh] overflow-hidden rounded-xl shadow-xl bg-white/5"
         >
+          <% const questions = form.questions;
+          for( let i=0; i<questions.length; i++ ){
+            %>
+            <% if(i == 0){
+              %>
+              <!-- Question #1 Start -->
 
-        <% const questions = form.questions;
-        for( let i=0; i<questions.length; i++ ){ %>
-          <% if(i === questions.length-1){ %>
-         <!-- Question #last Start -->
-         <div class="hidden duration-700 ease-in-out px-4" data-carousel-item>
-          <div
-            class="w-full h-full flex flex-col items-center justify-center"
-          >
-            <img src="/form/images/Vector.png" alt="" srcset="" />
-            <div class="flex flex-col items-center">
-              <p class="text-xl font-light text-white"><%= department.name %></p>
-              <p
-                class="text-white text-2xl text-center font-extrabold mt-4 mb-12"
-              >
-              <%= questions[i] %>
-              </p>
-              <div class="flex flex-col group">
-                <fieldset class="starability-basic">
-                  <input
-                    type="radio"
-                    id="no-rate<%= i %>"
-                    class="input-no-rate"
-                    name="ratings<%= i %>"
-                    value="1"
-                    checked
-                    aria-label="No rating."
-                  />
-                  <input
-                    type="radio"
-                    id="first-rate<%= i %>1"
-                    name="ratings<%= i %>"
-                    value="1"
-                  />
-                  <label for="first-rate<%= i %>1" title="Terrible">1 star</label>
-                  <input
-                    type="radio"
-                    id="first-rate<%= i %>2"
-                    name="ratings<%= i %>"
-                    value="2"
-                  />
-                  <label for="first-rate<%= i %>2" title="Not good">2 stars</label>
-                  <input
-                    type="radio"
-                    id="first-rate<%= i %>3"
-                    name="ratings<%= i %>"
-                    value="3"
-                  />
-                  <label for="first-rate<%= i %>3" title="Average">3 stars</label>
-                  <input
-                    type="radio"
-                    id="first-rate<%= i %>4"
-                    name="ratings<%= i %>"
-                    value="4"
-                  />
-                  <label for="first-rate<%= i %>4" title="Very good">4 stars</label>
-                  <input
-                    type="radio"
-                    id="first-rate<%= i %>5"
-                    name="ratings<%= i %>"
-                    value="5"
-                  />
-                  <label for="first-rate<%= i %>5" title="Amazing">5 stars</label>
-                </fieldset>
-              </div>
-              <!-- Slider controls -->
-              <div class="mt-36 flex w-full justify-center gap-x-2">
-                <button
-                  type="button"
-                  id="previous-button"
-                  data-carousel-prev
-                  class="flex items-center justify-center w-[20%] bg-[#E5EDF4] rounded-lg cursor-pointer group focus:outline-none"
-                >
-                  <img src="/form/images/back-arrow.png" />
-                </button>
-                <button
-                  type="button"
-                  id="submit-btn"
-                  class="flex items-center justify-center w-[80%] bg-[#E5EDF4] px-4 py-3 rounded-lg cursor-pointer group focus:outline-none"
-                >
-                  <p class="font-bold text-sm md:text-xl text-[#003366]">
-                    Submit Feedback
-                  </p>
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-        <!-- Question #last End -->
-          <% }else if(i == 0 && questions.length > 1){ %>
-            <!-- Question #1 Start -->
           <div
           class="hidden duration-700 ease-in-out px-4"
           data-carousel-item="active"
@@ -173,15 +90,19 @@
             <img src="/form/images/Vector.png" alt="" srcset="" />
             <div class="flex flex-col items-center">
               <p class="text-xl md:text-3xl font-light text-white">
-                <%= department.name %>
+                INFORMATICS
               </p>
               <p
                 class="text-white text-2xl md:text-4xl text-center font-extrabold mt-4 mb-12"
               >
-                <%= questions[i] %>
+              <%= questions[i] %>
               </p>
               <div class="flex flex-col group">
                 <fieldset class="starability-basic">
+                  <!--
+                    For Backend Modifications:
+                      - Changed name to "ratings"
+                  -->
                   <input
                     type="radio"
                     id="no-rate<%= i %>"
@@ -231,7 +152,6 @@
               <!-- Slider controls -->
               <button
                 type="button"
-                id="next-button"
                 class="flex items-center justify-center w-full bg-[#E5EDF4] mt-36 px-4 py-3 rounded-lg cursor-pointer group focus:outline-none"
                 data-carousel-next
               >
@@ -243,19 +163,19 @@
           </div>
         </div>
         <!-- Question #1 End -->
-          <% }else{ %>
-            <!-- Question #n Start -->
+              <%
+            }else if(i === questions.length-1){
+              %>
+              <!-- Question #last Start-->
           <div class="hidden duration-700 ease-in-out px-4" data-carousel-item>
             <div
               class="w-full h-full flex flex-col items-center justify-center"
             >
               <img src="/form/images/Vector.png" alt="" srcset="" />
               <div class="flex flex-col items-center">
-                <p class="text-xl md:text-3xl font-light text-white">
-                  <%= department.name %>
-                </p>
+                <p class="text-xl font-light text-white">INFORMATICS</p>
                 <p
-                  class="text-white text-2xl md:text-4xl text-center font-extrabold mt-4 mb-12"
+                  class="text-white text-2xl text-center font-extrabold mt-4 mb-12"
                 >
                   <%= questions[i] %>
                 </p>
@@ -308,68 +228,144 @@
                   </fieldset>
                 </div>
                 <!-- Slider controls -->
-                <div class="mt-36 flex gap-x-2 w-full">
+                <div class="mt-36 flex w-full justify-center gap-x-2">
                   <button
                     type="button"
-                    id="previous-button<%= i+1 %>"
-                    class="flex items-center justify-center w-full bg-[#E5EDF4] px-4 py-3 rounded-lg cursor-pointer group focus:outline-none"
+                    class="flex items-center justify-center w-[20%] bg-[#E5EDF4] rounded-lg cursor-pointer group focus:outline-none"
+                    data-carousel-prev
                   >
-                    <p class="font-bold text-sm md:text-xl text-[#003366]">
-                      Previous
-                    </p>
+                    <img src="/form/images/back-arrow.png" />
                   </button>
                   <button
                     type="button"
-                    id="next-button<%= i+1 %>"
-                    class="flex items-center justify-center w-full bg-[#E5EDF4] px-4 py-3 rounded-lg cursor-pointer group focus:outline-none"
+                    class="flex items-center justify-center w-[80%] bg-[#E5EDF4] px-4 py-3 rounded-lg cursor-pointer group focus:outline-none"
+                    data-carousel-prev
+                    id="submit-btn"
                   >
                     <p class="font-bold text-sm md:text-xl text-[#003366]">
-                      Next
+                      Submit Feedback
                     </p>
                   </button>
                 </div>
               </div>
             </div>
           </div>
-          <!-- Question #n End -->
-          <% } %>
-        <% } %>
-          
-          
+          <!-- Question #last End-->
+              <%
+            }else{
+              %>
+              <!-- Question #n Start -->
+              <div
+              class="hidden duration-700 ease-in-out px-4"
+              data-carousel-item="active"
+              >
+                <div
+                  class="w-full h-full flex flex-col items-center justify-center"
+                >
+                  <img src="/form/images/Vector.png" alt="" srcset="" />
+                  <div class="flex flex-col items-center">
+                    <p class="text-xl md:text-3xl font-light text-white">
+                      INFORMATICS
+                    </p>
+                    <p
+                      class="text-white text-2xl md:text-4xl text-center font-extrabold mt-4 mb-12"
+                    >
+                    <%= questions[i] %>
+                    </p>
+                    <div class="flex flex-col group">
+                      <fieldset class="starability-basic">
+                        <!--
+                          For Backend Modifications:
+                            - Changed name to "ratings"
+                        -->
+                        <input
+                          type="radio"
+                          id="no-rate"
+                          class="input-no-rate"
+                          name="ratings<%= i %>"
+                          value="1"
+                          checked
+                          aria-label="No rating."
+                        />
+                        <input
+                          type="radio"
+                          id="first-rate1"
+                          name="ratings<%= i %>"
+                          value="1"
+                        />
+                        <label for="first-rate1" title="Terrible">1 star</label>
+                        <input
+                          type="radio"
+                          id="first-rate2"
+                          name="ratings<%= i %>"
+                          value="2"
+                        />
+                        <label for="first-rate2" title="Not good">2 stars</label>
+                        <input
+                          type="radio"
+                          id="first-rate3"
+                          name="ratings<%= i %>"
+                          value="3"
+                        />
+                        <label for="first-rate3" title="Average">3 stars</label>
+                        <input
+                          type="radio"
+                          id="first-rate4"
+                          name="ratings<%= i %>"
+                          value="4"
+                        />
+                        <label for="first-rate4" title="Very good">4 stars</label>
+                        <input
+                          type="radio"
+                          id="first-rate5"
+                          name="ratings<%= i %>"
+                          value="5"
+                        />
+                        <label for="first-rate5" title="Amazing">5 stars</label>
+                      </fieldset>
+                    </div>
+                    <!-- Slider controls -->
+                    <button
+                      type="button"
+                      class="flex items-center justify-center w-full bg-[#E5EDF4] mt-36 px-4 py-3 rounded-lg cursor-pointer group focus:outline-none"
+                      data-carousel-next
+                    >
+                      <p class="font-bold text-sm md:text-xl text-[#003366]">
+                        Next
+                      </p>
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <!-- Question #n End -->
+              <%
+            }
+          } %>
           
         </div>
+        <!-- Carousel Wrapper End-->
         <!-- Slider indicators -->
         <div
           class="absolute z-30 flex -translate-x-1/2 space-x-1 rtl:space-x-reverse bottom-5 left-1/2"
         >
-        <% for(let i=0; i<questions.length; i++){ %>
           <button
             type="button"
             class="w-2 h-2 rounded-full"
             aria-current="true"
-            aria-label="Slide <%= i+1 %>"
-            data-carousel-slide-to="<%= i %>"
+            aria-label="Slide 1"
+            data-carousel-slide-to="0"
           ></button>
-        <% } %>
+          <button
+            type="button"
+            class="w-2 h-2 rounded-full"
+            aria-current="false"
+            aria-label="Slide 2"
+            data-carousel-slide-to="1"
+          ></button>
         </div>
       </form>
     </main>
     <!-- Flowbite -->
     <script src="https://cdn.jsdelivr.net/npm/flowbite@2.4.1/dist/flowbite.min.js"></script>
-    <script>
-      <% for(let i=2; i<questions.length; i++){ %>
-        document
-        .getElementById("next-button<%= i %>")
-        .addEventListener("click", function () {
-          document.getElementById("next-button").click();
-        });
-      document
-        .getElementById("previous-button<%= i %>")
-        .addEventListener("click", function () {
-          document.getElementById("previous-button").click();
-        });
-      <% } %>
-      
-    </script>
   </body>
 </html>

@@ -43,6 +43,20 @@ document.addEventListener('DOMContentLoaded', async () => {
         e.preventDefault();
 
         const form = document.getElementById('main-form');
+
+        /*
+            Create a "ratings" input form for all the ratings
+        */
+
+            const questionsCount = document.querySelectorAll('.duration-700.ease-in-out.px-4').length;
+            for(let i = 0; i<questionsCount; i++){
+                const ratingsInput = document.createElement('input');
+                ratingsInput.type = "hidden";
+                ratingsInput.name = "ratings";
+                ratingsInput.value = document.querySelector(`input[name="ratings${i}"]:checked`).value;
+                form.appendChild(ratingsInput)
+            }
+        
         
         const formData = new FormData(form);
 
@@ -62,7 +76,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             throw new Error(data.error);
         };
 
-        location.href = `/event/${eventId}/department/${departmentId}/form/${formId}`;
+        location.href = `/event/${eventId}/department/${departmentId}/form/${formId}/dashboard`;
         return;
 
     })

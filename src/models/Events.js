@@ -9,8 +9,25 @@ const eventsSchema = new mongoose.Schema({
     createdAt: {
         type: Date,
         default: () => Date.now(),
+    },
+    updatedAt: {
+        type: Date,
+    },
+    updatedBy: {
+        type: mongoose.SchemaTypes.ObjectId,
+        required: true,
+    },
+    status: {
+        type: String,
+        default: 'Ongoing',
     }
+
 });
+
+eventsSchema.pre('save', function(next){
+    this.updatedAt = Date.now();
+    next();
+})
 
 const Events = mongoose.model('Events', eventsSchema);
 

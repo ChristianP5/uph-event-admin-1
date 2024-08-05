@@ -31,6 +31,7 @@ const deleteDepartment = require("../services/departments/deleteDepartment");
 const deleteUserByDepartmentId = require("../services/users/deleteUserByDepartmentId");
 const deleteEvent = require("../services/events/deleteEvent");
 const deleteUserByEventId = require("../services/users/deleteUserByEventId");
+const deleteRefreshToken = require("../services/auth/deleteRefreshToken");
 
 const getRootHandler = (request, h) => {
 
@@ -328,6 +329,8 @@ const editEventHandler = async (request, h) => {
 
     // 2)
     const userRole = userInfo.role;
+    const userId = userInfo._id;
+
     const [department_id, event_id, access_level] = userRole.split('/');
 
     if(department_id !== "admin"  || ( event_id !== "admin" && event_id !== eventId ) || access_level !== "admin"){
@@ -335,7 +338,7 @@ const editEventHandler = async (request, h) => {
     };
 
     // 3)
-    const event = await editEvent(eventId, name);
+    const event = await editEvent(eventId, name, userId);
 
     const response = h.response({
         status: 'success',
@@ -723,6 +726,42 @@ const postLoginHandler = async (request, h) => {
     return response;
 }
 
+/*
+    LOG OUT Handler
+    1) Check if Logged In
+    2) Delete RefreshToken
+*/
+
+const postLogoutHandler = async (request, h) => {
+    const { refreshToken } = request.payload;
+
+    console.log(refreshToken);
+
+    // 1)
+    try{
+        const userInfo = request.auth.credentials._doc;
+        if(!userInfo){
+            throw new Error("Invalid Current User");
+        }
+
+        // 2) 
+        await deleteRefreshToken(refreshToken);
+
+        const response = h.response({
+            status: 'success',
+            message: 'Logged Out Successfully!'
+        });
+
+        response.code(200);
+
+        return response;
+
+    }catch(error){
+        throw new Error(error.message);
+    }
+    
+}
+
 
 /*
 LOAD LOG IN PAGE Handler
@@ -925,6 +964,7 @@ const createEventHandler = async (request, h) => {
     // 1)
     const userInfo = request.auth.credentials._doc;
     const userRole = userInfo.role;
+    const userId = userInfo._id;
 
     if(userRole !== "admin/admin/admin"){
         throw new Error("Unauthorized Access!");
@@ -938,7 +978,7 @@ const createEventHandler = async (request, h) => {
 
 
     // 2)
-    const event = await createEvent(name);
+    const event = await createEvent(name, userId);
 
     const eventId = event._id;
     // 3)
@@ -1053,6 +1093,47 @@ const getEventDashboardPageHandler = async (request, h) => {
     return h.view('event/dashboard.ejs', data);
     
 }
+
+/*
+    GET EVENT ADMIN Handler
+    1) Get UserInfo
+    2) Validate user with role:
+    - "admin/admin/admin"
+    - "admin/<this-event-id>/admin"
+    3) Get Event Admin
+*/
+
+const getEventAdminsHandler = async (request, h) => {
+    const { eventId } = request.params;
+
+    // 1)
+    const userInfo = request.auth.credentials._doc;
+
+    // 2)
+    const userRole = userInfo.role;
+    const [department_id, event_id, access_level] = userRole.split('/');
+
+    if(department_id !== "admin" || (event_id !== "admin" && event_id !== eventId) || access_level !== "admin"){
+        throw new Error("Unauthorized Access!");
+    }
+
+    // 3) 
+    const adminUser = await getUserByEventId(eventId);
+
+    const response = h.response({
+        status: 'success',
+        message: 'Event Admin retrieved successfully!',
+        data: {
+            users: adminUser
+        },
+    });
+
+    response.code(200);
+
+    return response;
+
+}
+
 
 /*
     GET EDIT EVENT ADMIN PAGE Handler
@@ -1615,6 +1696,8 @@ const getCreateResponsePagePageHandler = async (request, h) => {
 const createDepartmentResponseHandler = async (request, h) => {
     const { departmentId, eventId, ratings, formId } = request.payload;
 
+    console.log(request.payload);
+
     // 1)
     const userInfo = request.auth.credentials._doc;
     const userRole = userInfo.role;
@@ -1698,5 +1781,5 @@ module.exports = {
     getEditDepartmentPageHandler, editDepartmentHandler, getAdminUserHandler,
     getEditAdminUserPageHandler, editAdminUserHandler,
     deleteFormHandler, deleteDepartmentHandler, deleteEventHandler,
-    getEventsHandler
+    getEventsHandler, getEventAdminsHandler, postLogoutHandler
 }

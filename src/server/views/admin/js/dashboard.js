@@ -47,8 +47,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     // a) Load
     const eventsList = document.getElementById('event-list');
     events.forEach(event => {
-        const item = document.createElement('div');
-        item.classList = "row mt-2";
+        const item = document.createElement('tr');
+        item.classList = "border-t border-[#AAC1D7] hover:bg-[#E5EDF4] hover:shadow-lg";
+        
+        // Old
+        /*
         item.innerHTML = `
         <div class="col d-flex">
           <a href="/event/${event._id}/edit" class="btn btn-primary me-2"
@@ -62,31 +65,63 @@ document.addEventListener('DOMContentLoaded', async () => {
           </a>
         </div>
         `;
+        */
+        item.innerHTML = `
+        <td class="py-3 px-4">
+            <div class="event-name-wrapper">
+                <a href="/event/${event._id}/dashboard" class="text-blue-600 underline event-name">${event.name}</a>
+            </div>
+            <div class="event-buttons mt-2 flex space-x-2">
+                <button disabled class="bg-blue-500 text-white px-2 py-1 rounded flex items-center space-x-1" onclick="editEvent('${event.name}')">
+                    <i class="fas fa-edit"></i>
+                    <span class="text-sm">Edit Event</span>
+                </button>   
+                <button id="delete-event-btn" class="bg-red-500 text-white px-2 py-1 rounded flex items-center space-x-1">
+                    <i class="fas fa-trash"></i>
+                    <span class="text-sm">Delete Event</span>
+                </button>
+            </div>
+        </td>
+        `;
         eventsList.appendChild(item);
 
-        const deleteButton = item.querySelector('#delete-event-btn');
-        deleteButton.addEventListener('click', async (e) => {
-            e.preventDefault();
-            
-            const targetEndpoint = `/api/events/${event._id}`;
-            const result = await fetch(targetEndpoint, {
-                method: 'DELETE',
-                headers: {
-                    'Authorization' : `Bearer ${accessToken}`,
-                },
-            });
+        // Delete Event Functionality (with Confirmation)
+            function confirmDeleteEvent(eventId) {
+                
+                document.getElementById('deletePopupOverlay').style.display = 'block';
+                document.getElementById('deletePopup').style.display = 'block';
+                document.getElementById('confirmDeleteButton').onclick = async () => {
+                    
+                    const targetEndpoint = `/api/events/${eventId}`;
+                    const result = await fetch(targetEndpoint, {
+                        method: 'DELETE',
+                        headers: {
+                            'Authorization' : `Bearer ${accessToken}`,
+                        },
+                    });
 
-            const data = await result.json();
+                    const data = await result.json();
 
-            if(!result.ok){
-                alert(data.message);
-                throw new Error(data.error);
+                    if(!result.ok){
+                        alert(data.message);
+                        throw new Error(data.error);
+                    }
+
+                    location.href = '/admin/dashboard';
+                    return;
+                    };
+
             }
+            
+            const deleteButton = item.querySelector('#delete-event-btn');
+            deleteButton.addEventListener('click', async (e) => {
+                e.preventDefault();
 
-            location.href = '/admin/dashboard';
-            return;
-
-        })
+                confirmDeleteEvent(event._id);
+                
+                
+            })
+        
 
     })
 
@@ -112,13 +147,31 @@ document.addEventListener('DOMContentLoaded', async () => {
     const adminCredentialsSect = document.getElementById('admin-credentials-sect');
     adminUsers.forEach(adminUser => {
         const item = document.createElement('tr');
+        item.classList = "border-t border-[#AAC1D7] hover:bg-[#E5EDF4] hover:shadow-lg"
+        
+        // Old
+        /*
         item.innerHTML = `
             <td>${adminUser.username}</td>
             <td>${adminUser.password}</td>
             <td><a href="/admin/user/${adminUser._id}/edit" class="btn btn-primary">Edit User Credentials</a></td>
         `;
+        */
+
+        item.innerHTML = `
+        <td class="py-3 px-4">${adminUser.username}</td>
+        <td class="py-3 px-4">${adminUser.password}</td>
+        <td class="py-3 px-4">
+            <button disabled class="bg-blue-500 text-white px-2 py-1 rounded" onclick="toggleEditCredentials('UPH_Event_Admin', this)">Edit User Credentials</button>
+        </td>
+        `;
 
         adminCredentialsSect.appendChild(item);
     })
+
+    // Actions
+
+    
     
 })
+

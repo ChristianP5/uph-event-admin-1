@@ -25,29 +25,44 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // Display Action Buttons based on Access_Level Roles
+    
     if(access_level === "admin"){
 
-        const actionButtonsSection = document.getElementById('action-buttons-sect');
-        actionButtonsSection.style.display = "block";
+        const formActionButtonsSection = document.getElementById('form-action-buttons-sect');
+        formActionButtonsSection.style.display = "block";
 
         // 'Add Form' Action Button
-        const addFormButton = document.createElement('a');
-        addFormButton.href = `/event/${eventId}/department/${departmentId}/form/new`;
+        const addFormButton = document.createElement('button');
+        addFormButton.onclick = () => {
+            location.href = `/event/${eventId}/department/${departmentId}/form/new`;
+        } 
         addFormButton.id = "add-form-btn";
-        addFormButton.classList = "btn btn-success";
-        addFormButton.textContent = "Add Form";
+        addFormButton.classList = "bg-yellow-500 text-white px-2 py-1 rounded flex items-center space-x-1";
+        addFormButton.innerHTML = `
+        <i class="fas fa-plus"></i>
+        <span class="text-sm"> Create Form</span>
+        `;
 
-        actionButtonsSection.appendChild(addFormButton);
+        formActionButtonsSection.appendChild(addFormButton);
 
+        
         // 'Add Department Members' Action Button
-        const addMembersButton = document.createElement('a');
-        addMembersButton.href = `/event/${eventId}/department/${departmentId}/users/new`;
+        const membersActionButtonsSection = document.getElementById('members-action-buttons-sect');
+        const addMembersButton = document.createElement('button');
+        addMembersButton.onclick = () => {
+            location.href = `/event/${eventId}/department/${departmentId}/users/new`;
+        } 
         addMembersButton.id = "add-member-btn";
-        addMembersButton.classList = "btn btn-secondary ms-2";
-        addMembersButton.textContent = "Add Department Members";
+        addMembersButton.classList = "bg-yellow-500 text-white px-2 py-1 rounded flex items-center space-x-1";
+        addMembersButton.innerHTML = `
+        <i class="fas fa-plus"></i>
+        <span class="text-sm"> Add Department Member</span>
+        `;
 
-        actionButtonsSection.appendChild(addMembersButton);
+        membersActionButtonsSection.appendChild(addMembersButton);
+        
     }
+    
 
 
     // 3)
@@ -73,8 +88,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const membersList = document.getElementById('members-list');
     users.forEach(user => {
-        const item = document.createElement('div');
-        item.classList = "row mt-2";
+        const item = document.createElement('tr');
+        item.classList = "border-t border-[#AAC1D7] hover:bg-[#E5EDF4] hover:shadow-lg";
+        
+        // Old
+        /*
         item.innerHTML = 
         `
         <div class="col d-flex">
@@ -90,15 +108,26 @@ document.addEventListener('DOMContentLoaded', async () => {
             <p class="ms-2">${user.username}</p>
           </div>
         `;
+        */
 
+        item.innerHTML = `
+        <td class="py-3 px-4">${user.username}</td>
+        <td class="py-3 px-4">
+            <button class="bg-blue-500 text-white px-2 py-1 rounded" onclick="toggleEditCredentials('Christian', this)">Edit User Credentials</button>
+        </td>
+        `;
+
+        /*
         if(access_level === "user" && userInfo.username !== user.username){
             const editButton = item.querySelector('.btn.btn-primary.ms-2');
             editButton.classList.add('disabled');
         }
 
         const deleteButton = item.querySelector('.btn.btn-danger.ms-2.remove-department-user-btn');
+        */
 
         // Do not Show Delete Buttons to Users
+        /*
         if(access_level === "user"){
             deleteButton.classList.add('d-none');
         }
@@ -124,12 +153,15 @@ document.addEventListener('DOMContentLoaded', async () => {
             location.href = `/event/${eventId}/department/${departmentId}/dashboard`;
             return;
         })
+        */
+
         membersList.append(item);
     });
 
 
-    // Do not Show Admin Credentials to Users
-    if(access_level !== "user"){
+    // Admin Credentials Section
+    
+    if(access_level === "admin"){
         
         const targetEndpoint = `/api/event/${eventId}/department/${departmentId}/admin`;
         const result = await fetch(targetEndpoint, {
@@ -147,8 +179,33 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         const adminUser = data.data.adminUser;
+
+        const adminCredentialsSectSect = document.getElementById('admin-credentials-sect-sect');
+        adminCredentialsSectSect.innerHTML = `
+        <div class="mt-10 font-bold text-xl flex items-center">
+                <i class="fas fa-user-friends mr-3"></i> Edit Department Admin Credentials
+            </div>
+            
+            <div class="rounded-lg overflow-auto">
+                <table class="min-w-full">
+                    <thead>
+                        <tr>
+                            <th class="py-2 px-4 text-left">Username</th>
+                            <th class="py-2 px-4 text-left">Password</th>
+                            <th class="py-2 px-4 text-left">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="admin-credentials-sect">
+                      
+                    </tbody>
+                </table>
+            </div>
+        `;
         
         const adminCredentialsSect = document.getElementById('admin-credentials-sect');
+        
+        // Old
+        /*
         adminCredentialsSect.innerHTML = `
         <h2>Admin Credentials</h2>
         <a
@@ -171,7 +228,19 @@ document.addEventListener('DOMContentLoaded', async () => {
             </tbody>
         </table>
         `;
+        */
+
+        adminCredentialsSect.innerHTML = `
+        <tr class="border-t border-[#AAC1D7] hover:bg-[#E5EDF4] hover:shadow-lg">
+            <td class="py-3 px-4">${adminUser.username}</td>
+            <td class="py-3 px-4">${adminUser.password}</td>
+            <td class="py-3 px-4">
+                <button class="bg-blue-500 text-white px-2 py-1 rounded" onclick="toggleEditCredentials('Christian', this)">Edit User Credentials</button>
+            </td>
+        </tr>
+        `;
     }
+    
 
     // GET FORMS of Department
     const queryFormsTargetEndpoint = `/api/event/${eventId}/department/${departmentId}/forms`
@@ -193,8 +262,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const formsList = document.getElementById('forms-list');
     forms.forEach(form => {
-        const item = document.createElement('div');
-        item.classList = 'row mt-2';
+        const item = document.createElement('tr');
+        item.classList = 'border-t border-[#AAC1D7] hover:bg-[#E5EDF4] hover:shadow-lg';
+        
+        // Old
+        /*
         item.innerHTML = `
         <div class="col d-flex">
             <button class="btn btn-danger delete-form-btn me-2">Delete Form</button>
@@ -205,38 +277,76 @@ document.addEventListener('DOMContentLoaded', async () => {
             </a>
           </div>
         `;
+        */
 
-        const deleteButton = item.querySelector('.delete-form-btn');
+            item.innerHTML = `
+            <td class="py-3 px-4">
+                <div class="event-name-wrapper">
+                    <a href="/event/${eventId}/department/${departmentId}/form/${form._id}/dashboard" class="text-blue-600 underline event-name">${form.name}</a>
+                </div>
+                <div id="form-action-buttons" class="event-buttons mt-2 flex space-x-2">
+                    
+                </div>
+            </td>
+            `;
 
-        if(access_level !== "admin"){
-            item.querySelector('.col').removeChild(deleteButton);
-        }
+            if(access_level === "admin"){
+                item.querySelector('#form-action-buttons').innerHTML = `
+                <button id="delete-form-btn" class="bg-red-500 text-white px-2 py-1 rounded flex items-center space-x-1">
+                    <i class="fas fa-trash"></i>
+                    <span class="text-sm">Delete Form</span>
+                </button>
+                `;
+            }
+      
+
+        
+        
+        
 
         formsList.appendChild(item);
 
+        // Delete Form Function (with Confirmation)
+
+            // Confirmation Popup
+ 
+            function confirmDeleteForm(formId) {
+                document.getElementById('deletePopupOverlay').style.display = 'block';
+                document.getElementById('deletePopup').style.display = 'block';
+                document.getElementById('confirmDeleteButton').onclick = async () => {
+                    
+                    const deleteFormTargetEndpoint = `/api/event/${eventId}/department/${departmentId}/forms/${formId}`;
+                    const deleteFormResult = await fetch(deleteFormTargetEndpoint, {
+                        method: 'DELETE',
+                        headers: {
+                            'Authorization' : `Bearer ${accessToken}`,
+                        },
+                    });
+
+                    const deleteFormData = await deleteFormResult.json();
+
+                    if(!deleteFormResult.ok){
+                        alert(deleteFormData.message);
+                        throw new Error(deleteFormData.error);
+                    };
+
+                    location.href = `/event/${eventId}/department/${departmentId}/dashboard`;
+                    return;
+                    
+                };
+            }
+
+            
+
+            const deleteButton = item.querySelector('#delete-form-btn');
+            deleteButton.addEventListener('click', async (e) => {
+                e.preventDefault();
+
+                confirmDeleteForm(form._id);
+                
+                
+            })
         
-        deleteButton.addEventListener('click', async (e) => {
-            e.preventDefault();
-
-            const deleteFormTargetEndpoint = `/api/event/${eventId}/department/${departmentId}/forms/${form._id}`;
-            const deleteFormResult = await fetch(deleteFormTargetEndpoint, {
-                method: 'DELETE',
-                headers: {
-                    'Authorization' : `Bearer ${accessToken}`,
-                },
-            });
-
-            const deleteFormData = await deleteFormResult.json();
-
-            if(!deleteFormResult.ok){
-                alert(deleteFormData.message);
-                throw new Error(deleteFormData.error);
-            };
-
-            location.href = `/event/${eventId}/department/${departmentId}/dashboard`;
-            return;
-        })
-
 
     })
 

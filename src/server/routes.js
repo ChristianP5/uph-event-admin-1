@@ -20,7 +20,8 @@ const {
     editEventHandler, getEditEventPageHandler, getEditDepartmentPageHandler,
     editDepartmentHandler, getAdminUserHandler, getEditAdminUserPageHandler,
     editAdminUserHandler, deleteFormHandler, deleteDepartmentHandler,
-    deleteEventHandler, getEventsHandler
+    deleteEventHandler, getEventsHandler, getEventAdminsHandler,
+    postLogoutHandler,
 } = require('./handler');
 
 const path = require('path');
@@ -51,6 +52,11 @@ const routes = [
                 maxBytes: 1000000,
             }
         }
+    },
+    {
+        path: '/auth/logout',
+        method: 'POST',
+        handler: postLogoutHandler,
     },
     {
         path: '/auth/validateRT',
@@ -150,6 +156,11 @@ const routes = [
         path: '/api/event/{eventId}/departments',
         method: 'GET',
         handler: getDepartmentsByEventIdHandler,
+    },
+    {
+        path: '/event/{eventId}/admin/users',
+        method: 'GET',
+        handler: getEventAdminsHandler,
     },
     {
         path: '/api/event/{eventId}/admin',
@@ -434,7 +445,7 @@ const routes = [
         }
     },
     {
-        path: '/event/{eventId}/department/{departmentId}/form/{formId}',
+        path: '/event/{eventId}/department/{departmentId}/form/{formId}/dashboard',
         method: 'GET',
         handler: getFormPagePageHandler,
         options: {
