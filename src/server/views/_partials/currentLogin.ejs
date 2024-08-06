@@ -1,12 +1,14 @@
-<div class="text-gray-600 text-sm mb-2 mt-4">
+<div class="text-gray-600 text-sm mb-2 mt-6" style="display: flex; width: 40vw">
   <br />
-  <b class="text-[#003366]"
-    >You're logged in as: <span id="current-user"></span
-  ></b>
+  <b class="text-[#003366] me-2">You're logged in as: </b>
+  <div id="current-user">
+    <p class="skeleton skeleton-text" style="width: 200px"></p>
+  </div>
 </div>
 <script>
   const currentUserText = document.getElementById("current-user");
   getAuthUserInfo().then((userInfo) => {
+    currentUserText.innerHTML = "";
     currentUserText.textContent = userInfo.username;
   });
 </script>

@@ -4,12 +4,16 @@
   /<a href="ea-dashboard.html" class="breadcrumb-link">Dashboard</a> 
   /
   -->
+  <!-- Skeleton Loading Placholder Start -->
+  <div id="breadcrumbs-placeholder" style="display: flex"></div>
+  <!-- Skeleton Loading Placeholder End -->
 </div>
 <script>
   /*
         DYNAMIC BREADCRUMBS
-        1) Get User Role
-        2) Display Breadcrumbs based on User Role
+        1) Get Current Page Info
+        2) Get User Role
+        3) Display Breadcrumbs based on User Role
     */
 
   // 1)
@@ -17,9 +21,6 @@
     const accessToken = localStorage.getItem("accessToken");
 
     // 1)
-    const userInfo = await getAuthUserInfo();
-    const userRole = userInfo.role;
-    const [department_id, event_id, access_level] = userRole.split("/");
 
     let eventId, departmentId, formId;
     let nullableEventId, nullableDepartmentId, nullableFormId;
@@ -38,9 +39,36 @@
     console.log(departmentId);
     console.log(formId);
 
-    // 2)
-    const breadcrumbs = document.getElementById("breadcrumbs");
+    // Create Placeholder Based on Page
+    const breadcrumbsPlaceholder = document.getElementById(
+      "breadcrumbs-placeholder"
+    );
+    /*
+    <p class="skeleton skeleton-text me-2" style="width: 100px"></p>
+    <p class="me-2">/</p>
+    */
+    // Load Placeholder
+    for (i = 0; i < 3; i++) {
+      const breadcrumbsPlaceholderItem = document.createElement("p");
+      breadcrumbsPlaceholderItem.classList = "skeleton skeleton-text me-2";
+      breadcrumbsPlaceholderItem.style.width = "60px";
+      const breadcrumbsPlaceholderSlash = document.createElement("p");
+      breadcrumbsPlaceholderSlash.classList = "me-2";
+      breadcrumbsPlaceholderSlash.textContent = "/";
 
+      breadcrumbsPlaceholder.appendChild(breadcrumbsPlaceholderItem);
+      breadcrumbsPlaceholder.appendChild(breadcrumbsPlaceholderSlash);
+    }
+
+    // 2)
+    const userInfo = await getAuthUserInfo();
+
+    const userRole = userInfo.role;
+    const [department_id, event_id, access_level] = userRole.split("/");
+
+    // 3)
+    const breadcrumbs = document.getElementById("breadcrumbs");
+    breadcrumbs.innerHTML = "";
     // Admin
     if (
       department_id === "admin" &&

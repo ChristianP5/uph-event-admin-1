@@ -89,6 +89,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const users = data.data.users;
 
     const membersList = document.getElementById('members-list');
+    membersList.innerHTML = "";
     users.forEach(user => {
         const item = document.createElement('tr');
         item.classList = "border-t border-[#AAC1D7] hover:bg-[#E5EDF4] hover:shadow-lg";
@@ -435,6 +436,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const forms = queryFormsData.data.forms
 
     const formsList = document.getElementById('forms-list');
+    formsList.innerHTML = "";
     forms.forEach(form => {
         const item = document.createElement('tr');
         item.classList = 'border-t border-[#AAC1D7] hover:bg-[#E5EDF4] hover:shadow-lg';

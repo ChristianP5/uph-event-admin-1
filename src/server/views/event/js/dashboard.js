@@ -53,6 +53,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // b)
     const departmentsList = document.getElementById('main-list');
+    departmentsList.innerHTML = "";
     departments.forEach(department => {
         const item = document.createElement('tr');
         item.classList = "border-t border-[#AAC1D7] hover:bg-[#E5EDF4] hover:shadow-lg";
@@ -165,6 +166,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // d)
     const adminCredsList = document.getElementById('admin-credentials-list');
+    adminCredsList.innerHTML = "";
 
     const item = document.createElement('tr');
     item.classList = "border-t border-[#AAC1D7] hover:bg-[#E5EDF4] hover:shadow-lg";

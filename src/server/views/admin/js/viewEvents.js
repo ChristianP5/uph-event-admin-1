@@ -50,6 +50,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const events = data.data.events;
 
     const eventsList = document.getElementById('main-list');
+    eventsList.innerHTML = "";
     events.forEach(eventItem => {
         const item = document.createElement('tr');
         item.classList = "border-t border-[#AAC1D7] hover:bg-[#E5EDF4] hover:shadow-lg";

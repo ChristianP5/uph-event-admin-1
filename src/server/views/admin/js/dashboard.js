@@ -48,6 +48,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // a) Load
     const eventsList = document.getElementById('event-list');
+    eventsList.innerHTML = '';
     events.forEach(event => {
         const item = document.createElement('tr');
         item.classList = "border-t border-[#AAC1D7] hover:bg-[#E5EDF4] hover:shadow-lg";
@@ -157,6 +158,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const adminUsers = data.data.users;
 
     const adminCredentialsSect = document.getElementById('admin-credentials-sect');
+    adminCredentialsSect.innerHTML = '';
     adminUsers.forEach(adminUser => {
         const item = document.createElement('tr');
         item.classList = "border-t border-[#AAC1D7] hover:bg-[#E5EDF4] hover:shadow-lg"
