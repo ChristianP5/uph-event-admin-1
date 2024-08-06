@@ -78,7 +78,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             throw new Error(data.error);
         };
 
-        location.href = `/event/${eventId}/department/${departmentId}/form/${formId}/dashboard`;
+        location.href = `/event/${eventId}/department/${departmentId}/form/${formId}/response/new`;
         return;
 
     })

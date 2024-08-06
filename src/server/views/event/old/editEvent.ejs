@@ -16,60 +16,47 @@
       integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
       crossorigin="anonymous"
     ></script>
-    <script src="/auth/js/getAuthUserInfo.js"></script>
-    <script src="/department/js/editAdminUser.js"></script>
-    <link
-      rel="icon"
-      type="image/x-icon"
-      href="/file/_partials/images/favicon.ico"
-    />
+    <!-- IMPORTANT #1 Start -->
+    <script src="/file/auth/js/getAuthUserInfo.js"></script>
+    <script src="/file/event/js/editEvent.js"></script>
+    <link rel="stylesheet" href="/file/_partials/css/skeleton.css" />
+    <!-- IMPORTANT #1 End -->
   </head>
   <body class="container p-5 d-flex justify-content-center align-items-center">
     <main class="container w-25">
       <div class="container">
-        <h1>Edit <%= department.name %> Admin</h1>
+        <h1>Edit <%= event.name %></h1>
+        <!-- IMPORTANT #2 Start -->
         <h1 id="event-id" style="display: none"><%= event._id %></h1>
-        <h1 id="department-id" style="display: none"><%= department._id %></h1>
-        <h1 id="user-id" style="display: none"><%= user._id %></h1>
+        <!-- IMPORTANT #2 End -->
       </div>
+      <!-- IMPORTANT #3 Start (form MUST have id="main-form") -->
       <form action="" id="main-form" method="post">
+        <!-- IMPORTANT #3 End -->
         <div class="form-floating">
+          <!-- IMPORTANT #4 Start -->
           <input type="hidden" name="eventId" value="<%= event._id %>" />
-          <input
-            type="hidden"
-            name="departmentId"
-            value="<%= department._id %>"
-          />
+          <!-- IMPORTANT #4 End -->
           <input
             type="text"
-            name="username"
-            id="input-username"
+            name="name"
+            id="input-name"
             class="form-control"
-            placeholder="Member Username"
-            value="<%= user.username %>"
+            placeholder="Event Name"
+            value="<%= event.name %>"
             required
           />
           <label for="input-username" class="form-label">Username</label>
-        </div>
-        <div class="form-floating">
-          <input
-            type="password"
-            name="password"
-            id="input-password"
-            class="form-control"
-            placeholder="Member Password"
-            value="<%= user.password %>"
-            required
-          />
-          <label for="input-password" class="form-label">Password</label>
         </div>
 
         <div
           class="container d-flex justify-content-center align-items-center mt-3"
         >
+          <!-- IMPORTANT #5 Start (submit button MUST have id="submit-btn") -->
           <button type="button" id="submit-btn" class="btn btn-primary">
-            Edit Admin
+            Edit Event
           </button>
+          <!-- IMPORTANT #5 End -->
         </div>
       </form>
     </main>

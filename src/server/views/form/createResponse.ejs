@@ -25,6 +25,7 @@
     <script src="/file/auth/js/getAuthUserInfo.js"></script>
     <script src="/file/form/js/createResponse.js"></script>
     <!-- For Backend #1 End -->
+    <link rel="icon" type="image/x-icon" href="/file/_partials/images/favicon.ico">
   </head>
   <body
     class="h-screen flex flex-col bg-gradient-to-r from-[#003366] to-[#0066CC]"
@@ -41,7 +42,7 @@
     />
     <!-- Navigation bar -->
     <nav class="px-6 py-4 justify-between items-center flex z-10">
-      <a href="#"
+      <a href="/event/<%= event._id %>/department/<%= department._id %>/form/<%= form._id %>/dashboard"
         ><img src="/file/form/images/Logo UPH.svg" alt="Logo UPH" class="w-32"
       /></a>
     </nav>

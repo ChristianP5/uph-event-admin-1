@@ -1,0 +1,9 @@
+#auth-icon {
+    width: 30vw;
+}
+
+@media screen and (max-width: 767px) {
+    #auth-icon {
+        width: 60vw;
+    }
+}

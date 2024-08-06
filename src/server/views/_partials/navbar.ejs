@@ -29,7 +29,7 @@
 <!-- Logout Popup Start -->
 
 <!-- Sidebar Start -->
-<aside id="sidebar" class="sidebar bg-[#034E98] pt-16 fixed sidebar-shown">
+<aside id="sidebar" class="sidebar bg-[#034E98] pt-16 fixed sidebar-hidden">
         <div class="container mx-auto mt-4 justify-left items-left">
             <img src="/file/_partials/images/logouph.png" alt="UPH Logo" class="h-20 pl-4 pr-4 mt-30">
             <div class="text-white text-xl font-bold pl-6 pb-2" style="font-family: Inria Sans, sans-serif">Survey Hub</div>
@@ -140,6 +140,8 @@
             }
         }
 
+        
+
         // LOGOUT BUTTON
         const logoutButton = document.getElementById('logout-btn');
         logoutButton.addEventListener('click', async (e) => {
@@ -175,7 +177,10 @@
             return;
         })
 
+        
+
         document.addEventListener('DOMContentLoaded', async () => {
+            
             const accessToken = localStorage.getItem('accessToken');
 
             const userInfo = await getAuthUserInfo();
