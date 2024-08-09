@@ -8,12 +8,21 @@ const exportFormResponse = async (form, responses, department) => {
     const data = [];
 
     responses.forEach(response => {
+
+        /*
+        console.log(response.createdAt);
+        console.log(new Date(response.createdAt).toLocaleDateString());
+        console.log(new Date(response.createdAt).toLocaleTimeString());
+        console.log('===========================================')
+        */
+
         const item = {
             formId: form._id,
             department: department.name,
             departmentId: department._id,
             responseId: response._id,
-            createdAt: response.createdAt,
+            date: new Date(response.createdAt).toLocaleDateString(),
+            time: new Date(response.createdAt).toLocaleTimeString(),
         }
 
         for(let i = 0; i<form.questions.length; i+=1){
@@ -30,7 +39,8 @@ const exportFormResponse = async (form, responses, department) => {
         { header: 'Department', key: 'department', width: 15 },
         { header: 'Department ID', key: 'departmentId', width: 15 },
         { header: 'Response ID', key: 'responseId', width: 20 },
-        { header: 'Time', key: 'createdAt', width: 15 },
+        { header: 'Date', key: 'date', width: 15 },
+        { header: 'Time', key: 'time', width: 15 },
     ];
 
     for(let i = 0; i<form.questions.length; i+=1){

@@ -681,9 +681,10 @@ Steps:
 1) Check if Logged In
 2) Check if Valid Input
 3) Check if Valid User
-4) Give Access Token
-5) Create Refresh Token
-6) Store Refresh Token
+4) Check if Valid Recaptcha Token
+5) Give Access Token
+6) Create Refresh Token
+7) Store Refresh Token
 END) Return the Access Token and Refresh Token
 
 */
@@ -713,6 +714,30 @@ const postLoginHandler = async (request, h) => {
     const user = await getUserByCredentials(username, password);
 
     // 4)
+    const { default: fetch } = await import('node-fetch');
+    
+    const targetEndpoint = "https://www.google.com/recaptcha/api/siteverify";
+    const body = new URLSearchParams({
+        secret: process.env.RECAPTCHA_SERVER__SECRET_KEY,
+        response: request.payload['g-recaptcha-response'],
+    }).toString();
+
+    const result = await fetch(targetEndpoint, {
+        method: 'POST',
+        headers: {
+            'Content-Type' : 'application/x-www-form-urlencoded',
+        },
+        body: body,
+    });
+
+    const data = await result.json();
+
+    if(!data.success){
+        throw new Error("Captcha Invalid!");
+    }
+
+    
+    // 5)
     const payload = {
         _doc: {
             _id: user._id,
@@ -723,9 +748,11 @@ const postLoginHandler = async (request, h) => {
     };
     const accessToken = generateAccessToken(payload);
 
-    // 5)
+    // 6)
     const refreshToken = generateRefreshToken(payload);
     await saveRefreshToken(refreshToken);
+
+    
 
     // END)
     const response = h.response({

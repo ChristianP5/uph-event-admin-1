@@ -45,6 +45,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     submitButton.addEventListener('click', async (e) => {
         e.preventDefault();
 
+        // reCaptcha
+        if(grecaptcha.getResponse() === ""){
+            alert("Please fill in the captcha!");
+            throw new Error('reCaptcha not entered!');
+        }
+
+        
         const formData = new FormData(form);
 
         // Send Forms Data to API Endoint
@@ -62,8 +69,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         if(!result.ok){
             alert(data.message);
             localStorage.clear();
+            location.href = '/login';
             throw new Error(data.error);
         }
+
+        
 
         const newRefreshToken = data.data.refreshToken;
         const newAccessToken = data.data.accessToken;
@@ -72,7 +82,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         localStorage.setItem('refreshToken', newRefreshToken);
 
         window.location.href = '/authorization';
-
+        
 
     })
 

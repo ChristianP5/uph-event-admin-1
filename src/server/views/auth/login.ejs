@@ -18,6 +18,7 @@
     <!-- IMPORTANT #1 START -->
     <script src="/file/auth/js/isValidRefreshToken.js"></script>
     <script src="/file/auth/js/login.js"></script>
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
     <!-- IMPORTANT #1 END -->
     <link
       rel="icon"
@@ -52,7 +53,7 @@
                 type="text"
               />
             </div>
-            <div class="mb-11">
+            <div>
               <div class="w-full max-w-xs text-left mb-1">
                 <h2 class="text-left font-bold text-[#003366]">Password</h2>
               </div>
@@ -63,6 +64,14 @@
                 type="password"
               />
             </div>
+            <!-- reCaptcha Start -->
+            <div style="transform: scale(0.8); margin: 0 160px 30px 0">
+              <div
+                class="g-recaptcha"
+                data-sitekey="6LcB5iIqAAAAAOoOOW9G8K6ZZ38rJ-sfyEJAPhX3"
+              ></div>
+            </div>
+            <!-- reCaptcha End -->
             <div class="flex items-center justify-center">
               <button
                 id="submit-btn"

@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "nodem ./src/server/server.js"
+    "start": "node ./src/server/server.js"
   },
   "keywords": [],
   "author": "",
@@ -17,6 +17,7 @@
     "dotenv": "^16.4.5",
     "ejs": "^3.1.10",
     "exceljs": "^4.4.0",
-    "mongoose": "^8.5.0"
+    "mongoose": "^8.5.0",
+    "node-fetch": "^3.3.2"
   }
 }
