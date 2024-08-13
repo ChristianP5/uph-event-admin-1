@@ -35,6 +35,7 @@ const deleteRefreshToken = require("../services/auth/deleteRefreshToken");
 
 const LoadingError = require('./exceptions/LoadingError');
 
+
 const getRootHandler = (request, h) => {
 
     return h.redirect('/authorization');

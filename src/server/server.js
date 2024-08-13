@@ -8,7 +8,6 @@ const getDepartmentById = require('../services/departments/getDepartmentById');
 const getEventById = require('../services/events/getEventById');
 const LoadingError = require('./exceptions/LoadingError');
 const mongoose = require('mongoose');
-
 dotenv.config();
 
 const init = async ()=>{
@@ -135,10 +134,11 @@ const init = async ()=>{
         return h.continue;
     })
 
+    mongoose.connect(process.env.MONGODB_URL)
+
     server.route(routes);
 
     await server.start();
-    mongoose.connect(process.env.MONGODB_URL);
     console.log(`Server started at ${server.info.uri}`);
 }
 
