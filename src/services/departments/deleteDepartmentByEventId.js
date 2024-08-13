@@ -3,7 +3,7 @@ const Departments = require('../../models/Departments');
 
 const deleteDepartmentByEventId = async (eventId) => {
 
-    mongoose.connect(process.env.MONGODB_URL);
+    // mongoose.connect(process.env.MONGODB_URL);
 
     try{
         const departments = await Departments.deleteMany( { event: eventId } );

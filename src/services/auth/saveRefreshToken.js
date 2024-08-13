@@ -3,7 +3,7 @@ const RefreshTokens = require('../../models/RefreshTokens');
 
 const saveRefreshToken = async (refreshToken) => {
 
-    mongoose.connect(process.env.MONGODB_URL);
+    // mongoose.connect(process.env.MONGODB_URL);
 
     try{
         await RefreshTokens.create( {refreshToken: refreshToken} );

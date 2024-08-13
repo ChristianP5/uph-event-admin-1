@@ -3,7 +3,7 @@ const Events = require('../../models/Events');
 
 const editEvent = async (eventId, name, updatedBy) => {
 
-    mongoose.connect(process.env.MONGODB_URL);
+    // mongoose.connect(process.env.MONGODB_URL);
 
     try{
         const event = await Events.findById(eventId);

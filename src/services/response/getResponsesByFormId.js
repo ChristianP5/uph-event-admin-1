@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const Responses = require('../../models/Responses');
 
 const getResponsesByFormId = async (formId, direction = -1) => {
-    mongoose.connect(process.env.MONGODB_URL);
+    // mongoose.connect(process.env.MONGODB_URL);
 
     if(direction !== -1 && direction !== 1){
         direction = -1;

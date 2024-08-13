@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const Forms = require('../../models/Forms');
 
 const createForm = async (name, departmentId, questions) => {
-    mongoose.connect(process.env.MONGODB_URL);
+    // mongoose.connect(process.env.MONGODB_URL);
 
     try{
         const form = await Forms.create( { name: name, department: departmentId, questions: questions } );

@@ -3,7 +3,7 @@ const Forms = require('../../models/Forms');
 
 const getFormById = async (formId) => {
 
-    mongoose.connect(process.env.MONGODB_URL);
+    // .connect(process.env.MONGODB_URL);
 
     try{
         const form = await Forms.findOne( { _id: formId } );

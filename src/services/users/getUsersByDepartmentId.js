@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const Users = require('../../models/Users');
 
 const getUsersByDepartmentId = async (departmentId, query_access_level = "user") => {
-    mongoose.connect(process.env.MONGODB_URL);
+    // mongoose.connect(process.env.MONGODB_URL);
 
     try{
         const users = await Users.find().sort( { createdAt: -1 } );

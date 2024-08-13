@@ -3,7 +3,7 @@ const Departments = require('../../models/Departments');
 
 const editDepartment = async (departmentId, name) => {
 
-    mongoose.connect(process.env.MONGODB_URL);
+    // mongoose.connect(process.env.MONGODB_URL);
 
     try{
         const department = await Departments.findById(departmentId);

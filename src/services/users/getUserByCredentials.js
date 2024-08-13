@@ -3,7 +3,7 @@ const Users = require('../../models/Users');
 
 const getUserByCredentials = async (username, password) => {
 
-    mongoose.connect(process.env.MONGODB_URL);
+    // mongoose.connect(process.env.MONGODB_URL);
 
     try{
         const result = await Users.findOne( {username: username, password: password} );

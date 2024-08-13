@@ -16,13 +16,17 @@ const exportFormResponse = async (form, responses, department) => {
         console.log('===========================================')
         */
 
+        const dateOptions = {
+            timeZone: 'Asia/Jakarta',
+        };
+
         const item = {
             formId: form._id,
             department: department.name,
             departmentId: department._id,
             responseId: response._id,
-            date: new Date(response.createdAt).toLocaleDateString(),
-            time: new Date(response.createdAt).toLocaleTimeString(),
+            date: new Date(response.createdAt).toLocaleDateString("en-US", dateOptions),
+            time: new Date(response.createdAt).toLocaleTimeString("en-US", dateOptions),
         }
 
         for(let i = 0; i<form.questions.length; i+=1){

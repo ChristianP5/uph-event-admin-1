@@ -3,7 +3,7 @@ const RefreshTokens = require('../../models/RefreshTokens');
 
 const getRefreshTokenByRefreshToken = async (refreshToken) => {
 
-    mongoose.connect(process.env.MONGODB_URL);
+    // mongoose.connect(process.env.MONGODB_URL);
 
     try{
         const result = await RefreshTokens.find( {refreshToken: refreshToken} );

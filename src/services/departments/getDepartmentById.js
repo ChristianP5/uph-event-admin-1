@@ -3,7 +3,7 @@ const Departments = require('../../models/Departments');
 
 const getDepartmentById = async (departmentId) => {
 
-    mongoose.connect(process.env.MONGODB_URL);
+    // mongoose.connect(process.env.MONGODB_URL);
 
     try{
         const department = await Departments.findOne( { _id: departmentId } );

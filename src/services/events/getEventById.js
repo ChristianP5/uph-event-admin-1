@@ -3,7 +3,7 @@ const Events = require('../../models/Events');
 
 const getEventById = async (eventId) => {
 
-    mongoose.connect(process.env.MONGODB_URL);
+    // mongoose.connect(process.env.MONGODB_URL);
 
     try{
         const event = await Events.findOne( {_id: eventId} );

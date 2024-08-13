@@ -3,7 +3,7 @@ const Forms = require('../../models/Forms');
 
 const deleteForm = async (formId) => {
 
-    mongoose.connect(process.env.MONGODB_URL);
+    // mongoose.connect(process.env.MONGODB_URL);
 
     try{
         const form = await Forms.deleteOne( { _id: formId } );

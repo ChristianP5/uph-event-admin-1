@@ -3,7 +3,7 @@ const Users = require('../../models/Users');
 
 const getUserByUsername = async (username) => {
 
-    mongoose.connect(process.env.MONGODB_URL);
+    // mongoose.connect(process.env.MONGODB_URL);
 
     try{
         const user = await Users.findOne( {username: username} );

@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const Responses = require('../../models/Responses');
 
 const createResponse = async (ratings, formId) => {
-    mongoose.connect(process.env.MONGODB_URL);
+    // mongoose.connect(process.env.MONGODB_URL);
 
     try{
         const response = await Responses.create( {ratings: ratings, form: formId} );

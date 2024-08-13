@@ -3,7 +3,7 @@ const Departments = require('../../models/Departments');
 
 const getDepartmentsByEventId = async (eventId) => {
 
-    mongoose.connect(process.env.MONGODB_URL);
+    // mongoose.connect(process.env.MONGODB_URL);
 
     try{
         const departments = await Departments.find( { event: eventId } ).sort( { createdAt: -1 } )
